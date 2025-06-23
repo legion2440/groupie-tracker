@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Groupie Tracker</title>
+</head>
+<body>
+    <h1>Groupie Tracker</h1>
+
+    <!-- КНОПКА ОБНОВЛЕНИЯ -->
+    <button id="refresh-btn">Обновить информацию</button>
+
+    <ul>
+    {{range .Artists}}
+        <li>
+            <a href="/artist/{{.ID}}">
+                <img src="{{.Image}}" alt="{{.Name}}" width="80">
+                <br>{{.Name}}
+            </a>
+        </li>
+    {{end}}
+    </ul>
+
+    <!-- JS -->
+    <script src="/static/refresh.js"></script>
+</body>
+</html>
