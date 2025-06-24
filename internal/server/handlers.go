@@ -44,6 +44,11 @@ type dateWrap struct {
 
 // Главная страница — список артистов
 func ArtistsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		renderError(w, http.StatusNotFound, "Страница не найдена")
+		return
+	}
+
 	artists, err := core.GetArtists()
 	if err != nil {
 		renderError(w, 500, "Ошибка загрузки артистов")
@@ -158,6 +163,10 @@ func renderError(w http.ResponseWriter, code int, message string) {
 		http.Error(w, "Ошибка шаблона", http.StatusInternalServerError)
 		return
 	}
+
+	// ставим реальный HTTP-код
+	w.WriteHeader(code)
+
 	data := struct {
 		Code    int
 		Message string
@@ -165,7 +174,7 @@ func renderError(w http.ResponseWriter, code int, message string) {
 		Code:    code,
 		Message: message,
 	}
-	tmpl.Execute(w, data)
+	_ = tmpl.Execute(w, data)
 }
 
 // RefreshHandler запускает принудительное обновление кеша.

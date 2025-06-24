@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Groupie Tracker</title>
+  <meta charset="utf-8">
+  <title>Groupie Tracker</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Groupie Tracker</h1>
+  <div class="container">
 
-    <!-- КНОПКА ОБНОВЛЕНИЯ -->
-    <button id="refresh-btn">Обновить информацию</button>
+    <div class="topbar">
+        <span class="brand">Groupie&nbsp;Tracker</span>
 
-    <ul>
-    {{range .Artists}}
-        <li>
-            <a href="/artist/{{.ID}}">
-                <img src="{{.Image}}" alt="{{.Name}}" width="80">
-                <br>{{.Name}}
-            </a>
-        </li>
-    {{end}}
-    </ul>
+        <div class="topbar-right">
+            <button id="refresh-btn">Обновить информацию</button>
+            <label class="toggle">
+            <input type="checkbox" id="theme-switch">
+            <span class="slider"></span>
+            </label>
+        </div>
+    </div>
 
-    <!-- JS -->
-    <script src="/static/refresh.js"></script>
+    <div class="cards">
+      {{range .Artists}}
+        <a href="/artist/{{.ID}}" class="card">
+          <img src="{{.Image}}" alt="{{.Name}}">
+          <div>{{.Name}}</div>
+        </a>
+      {{end}}
+    </div>
+
+  </div>
+  <script src="/static/refresh.js"></script>
 </body>
 </html>

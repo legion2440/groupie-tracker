@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>{{ .Artist.Name }}</title>
+  <meta charset="utf-8">
+  <title>{{ .Artist.Name }}</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <a href="/">← Все артисты</a>
+  <div class="container">
+
+    <div class="topbar">
+        <span class="brand">Groupie&nbsp;Tracker</span>
+
+        <div class="topbar-right">
+            <button id="refresh-btn">Обновить информацию</button>
+            <label class="toggle">
+            <input type="checkbox" id="theme-switch">
+            <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <a href="/" class="back">← Все артисты</a>
 
     <h1>{{ .Artist.Name }}</h1>
     <img src="{{ .Artist.Image }}" alt="{{ .Artist.Name }}" width="200">
 
-    {{/* ===== Участники / Полное имя ===== */}}
     {{ $mCount := len .Artist.Members }}
     {{ if eq $mCount 1 }}
-        <p><b>Полное имя:</b> {{ index .Artist.Members 0 }}</p>
+      <p><b>Полное имя:</b> {{ index .Artist.Members 0 }}</p>
     {{ else }}
-        <h2>Участники</h2>
-        <ul>
-        {{ range .Artist.Members }}
-            <li>{{ . }}</li>
-        {{ end }}
-        </ul>
+      <h2>Участники</h2>
+      <ul>{{range .Artist.Members}}<li>{{.}}</li>{{end}}</ul>
     {{ end }}
 
     <p><b>Год основания:</b> {{ .Artist.CreationDate }}</p>
@@ -28,16 +38,13 @@
 
     <h2>Концерты по локациям</h2>
     {{ if .Concerts }}
-        {{ range .Concerts }}
-            <b>{{ .Location }}</b>
-            <ul>
-            {{ range .Dates }}
-                <li>{{ . }}</li>
-            {{ end }}
-            </ul>
-        {{ end }}
-    {{ else }}
-        <p>Нет информации о концертах</p>
-    {{ end }}
+      {{range .Concerts}}
+        <b>{{.Location}}</b>
+        <ul>{{range .Dates}}<li>{{.}}</li>{{end}}</ul>
+      {{end}}
+    {{ else }}<p>Нет информации о концертах</p>{{ end }}
+
+  </div>
+  <script src="/static/refresh.js"></script>
 </body>
 </html>

@@ -1,0 +1,93 @@
+/* ─── базовая палитра: СВЕТЛАЯ тема по умолчанию ───────────────── */
+:root {
+  --bg:        #F0F4FF;
+  --fg:        #1C2233;
+  --accent:    #1D4ED8; /* Tailwind v3 (blue-700) */
+  --card-bg:   #FFFFFF;
+  --card-hover:#E8EEFF;
+}
+
+/* ─── ТЁМНАЯ тема ───────────────────────────────────────────────── */
+body.theme-dark {
+  --bg:        #111620;
+  --fg:        #E5E8F0;
+  --accent:    #93C5FD; /* Tailwind v3 (blue-300) */
+  --card-bg:   #263249;
+  --card-hover:#2F3E5C;
+}
+html.theme-dark {
+  --bg:        #111620;
+  --fg:        #E5E8F0;
+  --accent:    #93C5FD; /* Tailwind v3 (blue-300) */
+  --card-bg:   #263249;
+  --card-hover:#2F3E5C;
+}
+
+/* ─── глобаль ───────────────────────────────────────────────────── */
+html,body{
+  margin:0; padding:0;
+  background:var(--bg); color:var(--fg);
+  font-family:system-ui,sans-serif;
+  transition: background .3s,color .3s;
+}
+
+a       { color:var(--accent); text-decoration:none; }
+a:hover,
+a:focus { text-decoration:underline; }
+
+h1,h2 { color:var(--accent); margin-top:0; }
+
+.container { max-width:1280px; margin:auto; padding:1rem; }
+
+/* ─── top-bar (кнопка + бренд + свитч) ─────────────────────────── */
+.topbar{display:flex;justify-content:space-between; align-items:center;margin-bottom:1rem;}
+.brand{font:700 1.5rem/1 "Segoe UI",sans-serif;color:var(--accent);}
+.topbar-right{display:flex;align-items:center;gap:.75rem}
+
+/* ─── toggle ─── */
+.toggle{position:relative;width:46px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;cursor:pointer;
+        background:#1D4ED8;border-radius:12px;transition:.3s}
+.slider:before{
+  position:absolute; content:"";
+  height:18px; width:18px; left:3px; bottom:3px;
+  background:#fff; border-radius:50%; transition:.3s;
+}
+.slider:after{
+  position:absolute; top:4px; left:6px; font-size:14px; color:#fff;
+  content:""; transition:.3s;
+}
+input:checked + .slider{background:var(--accent)}
+input:checked + .slider:before{transform:translateX(22px)}
+
+/* ─── карточки артистов ────────────────────────────────────────── */
+.cards{
+  display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;
+}
+.card{
+  width:160px; background:var(--card-bg); border-radius:8px;
+  padding:.5rem; text-align:center;
+  transition:transform .15s,background .3s;
+}
+.card:hover { transform:translateY(-4px); background:var(--card-hover); }
+.card img   { width:100%; border-radius:4px; }
+
+/* ─── кнопка «Обновить» ─────────────────────────────────────────── */
+button{
+  background:var(--accent); color:var(--bg);
+  border:none; padding:.5rem 1rem;
+  border-radius:4px; cursor:pointer; font-weight:600;
+}
+button:disabled { opacity:.5; cursor:default; }
+
+/* ─── responsive ────────────────────────────────────────────────── */
+@media (max-width:600px){
+  .card { width:100%; }
+}
+
+/* ─── блокирует анимацию переключателя до снятия .no-anim ─── */
+html.no-anim .slider,
+html.no-anim .slider:before{
+  transition:none !important;
+}
