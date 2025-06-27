@@ -1,18 +1,47 @@
 // static/refresh.js
 document.addEventListener('DOMContentLoaded', () => {
-  /* ── refresh ─────────────────────────────── */
   const btn = document.getElementById('refresh-btn');
-  if (btn) {
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      btn.textContent = 'Обновляю...';
-      try {
-        const res = await fetch('/api/refresh', { method: 'POST' });
-        btn.textContent = res.status === 202 ? 'Кеш обновлён ✓' : 'Ошибка';
-      } catch { btn.textContent = 'Сеть недоступна'; }
-      setTimeout(() => { btn.disabled = false; btn.textContent = 'Обновить информацию'; }, 3000);
-    });
-  }
+  if (!btn) return;
+
+  /* всплывашка, оставьте вашу реализацию */
+  function toast(msg, isErr=false){ console.log(isErr ? 'ERR:' : 'OK:', msg); }
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.classList.remove('error');
+    btn.textContent = 'Обновляю…';
+
+    let ok = false;
+    try {
+      const res = await fetch('/api/refresh', { method:'POST' });
+      if (res.ok){
+        ok = true;
+        toast('Кеш обновлён');
+        btn.textContent = 'Кеш обновлён ✓';
+      } else {
+        toast('Ошибка ' + res.status, true);
+        btn.textContent = 'Ошибка обновления';
+      }
+    } catch {
+      toast('Нет соединения', true);
+      btn.textContent = 'Сеть недоступна';
+    }
+
+    /* финальный шаг — включаем кнопку обратно */
+    btn.disabled = false;
+
+    /* красная подсветка держится, пока пользователь не нажмёт снова */
+    if (!ok) btn.classList.add('error');
+    else {
+      /* после успешного обновления через 3 с вернём исходный текст */
+      setTimeout(() => { btn.textContent = 'Обновить информацию'; }, 3000);
+    }
+  });
+
+  /* онлайн-/оффлайн-индикатор */
+  window.addEventListener('offline', () => { btn.disabled = true; });
+  window.addEventListener('online',  ()  => { btn.disabled = false; });
+
 
   /* ── dark / light toggle ─────────────────── */
   const toggle = document.getElementById('theme-switch');

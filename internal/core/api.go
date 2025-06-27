@@ -4,20 +4,36 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"time"
 
 	"groupie-tracker/internal/model"
 )
 
 const (
-	artistsURL   = "https://groupietrackers.herokuapp.com/api/artists"
-	locationsURL = "https://groupietrackers.herokuapp.com/api/locations"
-	datesURL     = "https://groupietrackers.herokuapp.com/api/dates"
-	relationsURL = "https://groupietrackers.herokuapp.com/api/relation"
+	artistsURL          = "https://groupietrackers.herokuapp.com/api/artists"
+	locationsURL        = "https://groupietrackers.herokuapp.com/api/locations"
+	datesURL            = "https://groupietrackers.herokuapp.com/api/dates"
+	relationsURL        = "https://groupietrackers.herokuapp.com/api/relation"
+	connectTimeout      = 3 * time.Second  // Dial (нет сети → ошибка)
+	headerTimeout       = 8 * time.Second  // сервер «просыпается»
+	overallRequestLimit = 30 * time.Second // всё вместе
 )
 
+// httpClient ограничивает время подключения и полный отклик.
+var httpClient = &http.Client{
+	Transport: &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout: connectTimeout,
+		}).DialContext,
+		ResponseHeaderTimeout: headerTimeout,
+	},
+	Timeout: overallRequestLimit,
+}
+
 func FetchArtists() ([]model.Artist, error) {
-	resp, err := http.Get(artistsURL)
+	resp, err := httpClient.Get(artistsURL)
 	if err != nil {
 		return nil, fmt.Errorf("fetch artists: %w", err)
 	}
@@ -31,7 +47,7 @@ func FetchArtists() ([]model.Artist, error) {
 }
 
 func FetchLocations() ([]model.Location, error) {
-	resp, err := http.Get(locationsURL)
+	resp, err := httpClient.Get(locationsURL)
 	if err != nil {
 		return nil, fmt.Errorf("fetch locations: %w", err)
 	}
@@ -52,7 +68,7 @@ func FetchLocations() ([]model.Location, error) {
 }
 
 func FetchDates() ([]model.Date, error) {
-	resp, err := http.Get(datesURL)
+	resp, err := httpClient.Get(datesURL)
 	if err != nil {
 		return nil, fmt.Errorf("fetch dates: %w", err)
 	}
@@ -73,7 +89,7 @@ func FetchDates() ([]model.Date, error) {
 }
 
 func FetchRelations() ([]model.Relation, error) {
-	resp, err := http.Get(relationsURL)
+	resp, err := httpClient.Get(relationsURL)
 	if err != nil {
 		return nil, fmt.Errorf("fetch relations: %w", err)
 	}

@@ -179,12 +179,12 @@ func renderError(w http.ResponseWriter, code int, message string) {
 
 // RefreshHandler запускает принудительное обновление кеша.
 func RefreshHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+	if err := core.UpdateNow(); err != nil {
+		log.Printf("update failed: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	go core.ForceUpdate()
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK) // 200 при успехе
 }
 
 // capitalizeASCII делает "santiago, chile" → "Santiago, Chile".

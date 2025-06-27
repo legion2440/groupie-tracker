@@ -91,3 +91,10 @@ html.no-anim .slider,
 html.no-anim .slider:before{
   transition:none !important;
 }
+
+.btn.error{
+  background:#dc2626 !important;   /* принудительно красный фон  */
+  border-color:#dc2626 !important; /* если у кнопки есть бордер  */
+  color:#fff !important;           /* текст остаётся белым       */
+}
+
