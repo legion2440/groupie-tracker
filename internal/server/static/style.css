@@ -83,7 +83,7 @@ button:disabled { opacity:.5; cursor:default; }
 
 /* ─── responsive ────────────────────────────────────────────────── */
 @media (max-width:600px){
-  .card { width:100%; }
+  .card { max-width:160px; }  /* можно "сжимать", но не растягивать */
 }
 
 /* ─── блокирует анимацию переключателя до снятия .no-anim ─── */
@@ -98,3 +98,15 @@ html.no-anim .slider:before{
   color:#fff !important;           /* текст остаётся белым       */
 }
 
+/* ─── минимальная ширина макета ─── */
+html, body{
+  min-width: 380px;       /* меньше - появится горизонтальный скролл */
+}
+
+/* ─── страница артиста ─── */
+.artist-img{
+  display:block;
+  max-width:320px;        /* не шире карточки на главной + паддинг */
+  width:100%;
+  height:auto;            /* не растягиваем по высоте */
+}
