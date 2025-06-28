@@ -54,8 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // начальное состояние: localStorage → иначе системная настройка
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   if (localStorage.theme === 'dark' || (!localStorage.theme && prefersDark)) {
-    body.classList.add('theme-dark');
-    root.classList.add('theme-dark');
+    body.classList.add('theme-dark');   // <body>
   }
   if (toggle) toggle.checked = body.classList.contains('theme-dark');
 
