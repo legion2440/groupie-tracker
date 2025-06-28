@@ -17,7 +17,9 @@ func InitRoutes() *http.ServeMux {
 	mux.Handle("/static/", http.StripPrefix("/static/",
 		http.FileServer(http.FS(sub))))
 
+	mux.HandleFunc("/img/", ImgProxy)
 	mux.HandleFunc("/", ArtistsHandler) // последний, catch-all
+
 	return mux
 }
 

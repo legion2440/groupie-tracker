@@ -23,7 +23,7 @@
     <div class="cards">
       {{range .Artists}}
         <a href="/artist/{{.ID}}" class="card">
-          <img src="{{.Image}}" alt="{{.Name}}">
+          <img src="/img/{{ .Image | base }}" alt="{{ .Name }}">
           <div>{{.Name}}</div>
         </a>
       {{end}}

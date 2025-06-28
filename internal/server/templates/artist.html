@@ -23,7 +23,7 @@
     <a href="/" class="back">← Все артисты</a>
 
     <h1>{{ .Artist.Name }}</h1>
-    <img src="{{ .Artist.Image }}" alt="{{ .Artist.Name }}" width="200">
+    <img src="/img/{{ .Artist.Image | base }}" alt="{{ .Artist.Name }}" width="200">
 
     {{ $mCount := len .Artist.Members }}
     {{ if eq $mCount 1 }}

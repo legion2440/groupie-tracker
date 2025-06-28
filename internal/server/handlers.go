@@ -1,7 +1,9 @@
 package server
 
 import (
+	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"path"
@@ -42,6 +44,12 @@ type dateWrap struct {
 	t   time.Time
 }
 
+var funcMap = template.FuncMap{
+	"base": path.Base, // queen.jpeg ← https://…/queen.jpeg
+}
+
+const imgCacheMaxAge = 604800 // 7 дней в секундах
+
 // Главная страница — список артистов
 func ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -65,7 +73,9 @@ func ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	tmpl, err := template.ParseFS(tmplFS, "templates/index.html")
+	tmpl, err := template.New("").
+		Funcs(funcMap). // +++
+		ParseFS(tmplFS, "templates/index.html")
 	if err != nil {
 		renderError(w, 500, "Ошибка шаблона")
 		log.Printf("parse template: %v", err)
@@ -73,7 +83,8 @@ func ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := PageData{Artists: cards}
-	tmpl.Execute(w, data)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl.ExecuteTemplate(w, "index.html", data)
 }
 
 // Детальная страница артиста
@@ -146,14 +157,17 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		Concerts: concerts,
 	}
 
-	tmpl, err := template.ParseFS(tmplFS, "templates/artist.html")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.New("").
+		Funcs(funcMap). // +++
+		ParseFS(tmplFS, "templates/artist.html")
 	if err != nil {
 		renderError(w, 500, "Ошибка шаблона")
 		log.Printf("parse template: %v", err)
 		return
 	}
 
-	tmpl.Execute(w, page)
+	tmpl.ExecuteTemplate(w, "artist.html", page)
 }
 
 // renderError отрисовывает кастомную страницу ошибки
@@ -165,6 +179,7 @@ func renderError(w http.ResponseWriter, code int, message string) {
 	}
 
 	// ставим реальный HTTP-код
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(code)
 
 	data := struct {
@@ -174,7 +189,7 @@ func renderError(w http.ResponseWriter, code int, message string) {
 		Code:    code,
 		Message: message,
 	}
-	_ = tmpl.Execute(w, data)
+	_ = tmpl.ExecuteTemplate(w, "error.html", data)
 }
 
 // RefreshHandler запускает принудительное обновление кеша.
@@ -207,4 +222,30 @@ func capitalizeCity(s string) string {
 		}
 	}
 	return strings.Join(words, " ")
+}
+
+// отдаёт artist-картинку с Cache-Control 7 дней.
+// Ожидает путь вида /img/42.jpg  – берёт "42" как ID артиста.
+func ImgProxy(w http.ResponseWriter, r *http.Request) {
+	filename := strings.TrimPrefix(r.URL.Path, "/img/") // queen.jpeg
+	orig := "https://groupietrackers.herokuapp.com/api/images/" + filename
+
+	resp, err := http.Get(orig)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		http.NotFound(w, r)
+		return
+	}
+	defer resp.Body.Close()
+
+	w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", imgCacheMaxAge))
+	w.Header().Set("Content-Type", "image/jpeg")
+	io.Copy(w, resp.Body)
+}
+
+func parseTemplates() (*template.Template, error) {
+	funcMap := template.FuncMap{
+		"base": path.Base, // берёт "queen.jpeg" из полного URL
+	}
+
+	return template.New("").Funcs(funcMap).ParseFS(tmplFS, "templates/*.html")
 }
