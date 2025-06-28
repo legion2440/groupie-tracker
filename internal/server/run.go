@@ -7,14 +7,28 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
 	"groupie-tracker/internal/core"
 )
 
+const defaultCacheTTL = 30 * time.Minute // TTL по умолчанию
+
 // Run запускает HTTP-сервер с кеш-воркером и graceful-shutdown.
 func Run(addr string, ttl time.Duration) error {
+	if ttl == 0 {
+		if v := os.Getenv("CACHE_TTL"); v != "" {
+			if n, err := strconv.Atoi(v); err == nil && n > 0 {
+				ttl = time.Duration(n) * time.Minute
+			}
+		}
+		if ttl == 0 {
+			ttl = defaultCacheTTL
+		}
+	}
+
 	mux := InitRoutes()
 
 	srv := &http.Server{

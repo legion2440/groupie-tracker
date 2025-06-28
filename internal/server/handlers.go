@@ -16,22 +16,16 @@ import (
 	"groupie-tracker/internal/model"
 )
 
-// минимальный набор полей для списка на главной.
+/*──────────────────── типы для шаблонов ────────────────────*/
+
 type ArtistCard struct {
 	ID    int
 	Name  string
 	Image string
 }
 
-// данные для шаблона index.html.
 type PageData struct {
 	Artists []ArtistCard
-}
-
-// Для детальной страницы
-type ArtistDetailPage struct {
-	Artist   model.Artist
-	Concerts []ConcertsByLocation
 }
 
 type ConcertsByLocation struct {
@@ -39,18 +33,41 @@ type ConcertsByLocation struct {
 	Dates    []string
 }
 
+type ArtistDetailPage struct {
+	Artist   model.Artist
+	Concerts []ConcertsByLocation
+}
+
 type dateWrap struct {
 	raw string
 	t   time.Time
 }
 
+/*──────────────────── шаблоны (init) ───────────────────────*/
+
 var funcMap = template.FuncMap{
 	"base": path.Base, // queen.jpeg ← https://…/queen.jpeg
 }
 
-const imgCacheMaxAge = 604800 // 7 дней в секундах
+var tmplAll *template.Template
 
-// Главная страница — список артистов
+func parseTemplates() (*template.Template, error) {
+	return template.New("").
+		Funcs(funcMap).
+		ParseFS(tmplFS, "templates/*.html")
+}
+
+func init() {
+	var err error
+	tmplAll, err = parseTemplates()
+	if err != nil {
+		log.Fatalf("parse templates: %v", err)
+	}
+}
+
+/*────────────────────────── хендлеры ───────────────────────*/
+
+// главная страница
 func ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		renderError(w, http.StatusNotFound, "Страница не найдена")
@@ -64,33 +81,18 @@ func ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var cards []ArtistCard
+	cards := make([]ArtistCard, 0, len(artists))
 	for _, a := range artists {
-		cards = append(cards, ArtistCard{
-			ID:    a.ID,
-			Name:  a.Name,
-			Image: a.Image,
-		})
+		cards = append(cards, ArtistCard{ID: a.ID, Name: a.Name, Image: a.Image})
 	}
 
-	tmpl, err := template.New("").
-		Funcs(funcMap). // +++
-		ParseFS(tmplFS, "templates/index.html")
-	if err != nil {
-		renderError(w, 500, "Ошибка шаблона")
-		log.Printf("parse template: %v", err)
-		return
-	}
-
-	data := PageData{Artists: cards}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tmpl.ExecuteTemplate(w, "index.html", data)
+	tmplAll.ExecuteTemplate(w, "index.html", PageData{Artists: cards})
 }
 
-// Детальная страница артиста
+// детальная страница артиста
 func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
-	idStr := strings.TrimPrefix(r.URL.Path, "/artist/")
-	idStr = path.Clean(idStr)
+	idStr := path.Clean(strings.TrimPrefix(r.URL.Path, "/artist/"))
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 1 {
 		renderError(w, 404, "Такой страницы не существует.")
@@ -100,10 +102,8 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 	artists, err := core.GetArtists()
 	if err != nil {
 		renderError(w, 500, "Ошибка загрузки артистов")
-		log.Printf("fetch artists: %v", err)
 		return
 	}
-
 	var artist *model.Artist
 	for _, a := range artists {
 		if a.ID == id {
@@ -116,118 +116,61 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем локации и даты концертов
-	relationsAll, err := core.GetRelations()
-	if err != nil {
-		renderError(w, 500, "Ошибка загрузки связей (relations)")
-		return
-	}
+	relations, _ := core.GetRelations()
 	var concerts []ConcertsByLocation
-	for _, rel := range relationsAll {
-		if rel.ID == id {
-			for rawCity, rawDates := range rel.DatesLocations {
-				city := strings.ReplaceAll(rawCity, "_", " ") // sao_paulo → sao paulo
-				city = strings.ReplaceAll(city, "-", ", ")    // santiago-chile → santiago, chile
-				city = capitalizeCity(city)                   // santiago, chile → Santiago, Chile
-
-				// даты без звёзд и в алфавитном порядке
-				// собираем и сортируем
-				dw := make([]dateWrap, 0, len(rawDates))
-				for _, d := range rawDates {
-					d = strings.TrimPrefix(d, "*")
-					if t, err := time.Parse("02-01-2006", d); err == nil {
-						dw = append(dw, dateWrap{raw: d, t: t})
-					}
+	for _, rel := range relations {
+		if rel.ID != id {
+			continue
+		}
+		for rawCity, rawDates := range rel.DatesLocations {
+			city := capitalizeCity(strings.ReplaceAll(strings.ReplaceAll(rawCity, "_", " "), "-", ", "))
+			dw := make([]dateWrap, 0, len(rawDates))
+			for _, d := range rawDates {
+				d = strings.TrimPrefix(d, "*")
+				if t, err := time.Parse("02-01-2006", d); err == nil {
+					dw = append(dw, dateWrap{raw: d, t: t})
 				}
-				sort.Slice(dw, func(i, j int) bool { return dw[i].t.Before(dw[j].t) })
-
-				dates := make([]string, len(dw))
-				for i, v := range dw {
-					dates[i] = v.raw
-				}
-				concerts = append(concerts, ConcertsByLocation{city, dates})
 			}
-
-			break
+			sort.Slice(dw, func(i, j int) bool { return dw[i].t.Before(dw[j].t) })
+			dates := make([]string, len(dw))
+			for i, v := range dw {
+				dates[i] = v.raw
+			}
+			concerts = append(concerts, ConcertsByLocation{city, dates})
 		}
 	}
 
-	page := ArtistDetailPage{
-		Artist:   *artist,
-		Concerts: concerts,
-	}
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tmpl, err := template.New("").
-		Funcs(funcMap). // +++
-		ParseFS(tmplFS, "templates/artist.html")
-	if err != nil {
-		renderError(w, 500, "Ошибка шаблона")
-		log.Printf("parse template: %v", err)
-		return
-	}
-
-	tmpl.ExecuteTemplate(w, "artist.html", page)
+	tmplAll.ExecuteTemplate(w, "artist.html", ArtistDetailPage{*artist, concerts})
 }
 
-// renderError отрисовывает кастомную страницу ошибки
-func renderError(w http.ResponseWriter, code int, message string) {
-	tmpl, err := template.ParseFS(tmplFS, "templates/error.html")
-	if err != nil {
-		http.Error(w, "Ошибка шаблона", http.StatusInternalServerError)
-		return
-	}
-
-	// ставим реальный HTTP-код
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.WriteHeader(code)
-
-	data := struct {
-		Code    int
-		Message string
-	}{
-		Code:    code,
-		Message: message,
-	}
-	_ = tmpl.ExecuteTemplate(w, "error.html", data)
-}
-
-// RefreshHandler запускает принудительное обновление кеша.
+// принудительное обновление кеша
 func RefreshHandler(w http.ResponseWriter, r *http.Request) {
 	if err := core.UpdateNow(); err != nil {
 		log.Printf("update failed: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		renderError(w, 500, "Internal Server Error")
 		return
 	}
-	w.WriteHeader(http.StatusOK) // 200 при успехе
+	w.WriteHeader(http.StatusOK)
 }
 
-// capitalizeASCII делает "santiago, chile" → "Santiago, Chile".
-// Работает только с буквами a-z; для кириллицы и полного Unicode
-// остаётся как есть, но в нашем API всё ASCII.
-func capitalizeCity(s string) string {
-	// ручной whitelist для типичных аббревиатур
-	abbr := map[string]struct{}{
-		"uk": {}, "usa": {}, "u.s.a": {}, "uae": {},
-	}
-	words := strings.Fields(s) // split by space
-	for i, w := range words {
-		lw := strings.ToLower(w)
-		if _, ok := abbr[lw]; ok {
-			words[i] = strings.ToUpper(w) // UK, USA
-			continue
-		}
-		if len(w) > 0 && 'a' <= w[0] && w[0] <= 'z' {
-			words[i] = strings.ToUpper(w[:1]) + w[1:]
-		}
-	}
-	return strings.Join(words, " ")
+// страница ошибки
+func renderError(w http.ResponseWriter, code int, msg string) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(code)
+	_ = tmplAll.ExecuteTemplate(w, "error.html",
+		struct {
+			Code    int
+			Message string
+		}{code, msg})
 }
 
-// отдаёт artist-картинку с Cache-Control 7 дней.
-// Ожидает путь вида /img/42.jpg  – берёт "42" как ID артиста.
+/*───────────────────── image proxy ─────────────────────────*/
+
+const imgCacheMaxAge = 60 * 60 * 24 * 7 // 7 дней
+
 func ImgProxy(w http.ResponseWriter, r *http.Request) {
-	filename := strings.TrimPrefix(r.URL.Path, "/img/") // queen.jpeg
+	filename := strings.TrimPrefix(r.URL.Path, "/img/")
 	orig := "https://groupietrackers.herokuapp.com/api/images/" + filename
 
 	resp, err := http.Get(orig)
@@ -237,15 +180,27 @@ func ImgProxy(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", imgCacheMaxAge))
+	w.Header().Set("Cache-Control",
+		fmt.Sprintf("public, max-age=%d", imgCacheMaxAge))
 	w.Header().Set("Content-Type", "image/jpeg")
 	io.Copy(w, resp.Body)
 }
 
-func parseTemplates() (*template.Template, error) {
-	funcMap := template.FuncMap{
-		"base": path.Base, // берёт "queen.jpeg" из полного URL
-	}
+/*───────────────────── helpers ─────────────────────────────*/
 
-	return template.New("").Funcs(funcMap).ParseFS(tmplFS, "templates/*.html")
+// santiago, chile → Santiago, Chile
+func capitalizeCity(s string) string {
+	abbr := map[string]struct{}{"uk": {}, "usa": {}, "u.s.a": {}, "uae": {}}
+	words := strings.Fields(s)
+	for i, w := range words {
+		lw := strings.ToLower(w)
+		if _, ok := abbr[lw]; ok {
+			words[i] = strings.ToUpper(w)
+			continue
+		}
+		if len(w) > 0 && 'a' <= w[0] && w[0] <= 'z' {
+			words[i] = strings.ToUpper(w[:1]) + w[1:]
+		}
+	}
+	return strings.Join(words, " ")
 }

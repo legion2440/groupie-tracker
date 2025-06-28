@@ -2,13 +2,12 @@ package main
 
 import (
 	"log"
-	"time"
 
 	"groupie-tracker/internal/server"
 )
 
 func main() {
-	if err := server.Run(":8080", 30*time.Minute); err != nil {
+	if err := server.Run(":8080", 0); err != nil {
 		log.Fatal(err)
 	}
 }
