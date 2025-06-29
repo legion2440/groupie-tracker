@@ -1,6 +1,8 @@
 package core
 
-import "testing"
+import (
+	"testing"
+)
 
 // TestFetchRelations проверяет, что парсер /relation
 // возвращает непустой срез и валидные ID > 0.

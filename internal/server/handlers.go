@@ -95,7 +95,7 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := path.Clean(strings.TrimPrefix(r.URL.Path, "/artist/"))
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 1 {
-		renderError(w, 404, "Такой страницы не существует.")
+		renderError(w, 404, "Страницы не существует")
 		return
 	}
 
@@ -146,6 +146,10 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 
 // принудительное обновление кеша
 func RefreshHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		renderError(w, http.StatusBadRequest, "Неверный HTTP-метод (ожидается POST)")
+		return
+	}
 	if err := core.UpdateNow(); err != nil {
 		log.Printf("update failed: %v", err)
 		renderError(w, 500, "Internal Server Error")
@@ -175,7 +179,7 @@ func ImgProxy(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := http.Get(orig)
 	if err != nil || resp.StatusCode != http.StatusOK {
-		http.NotFound(w, r)
+		renderError(w, http.StatusNotFound, "Картинка не найдена")
 		return
 	}
 	defer resp.Body.Close()
