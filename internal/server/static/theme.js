@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (toggle) toggle.checked = body.classList.contains('theme-dark');
 
-  // возвращаем анимацию – теперь она будет работать ТОЛЬКО по кликам
+  // возвращаем анимацию - работает только по кликам
   setTimeout(() => root.classList.remove('no-anim'), 0);
 
   // переключатель

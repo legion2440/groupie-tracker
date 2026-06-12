@@ -122,7 +122,7 @@ go test -v ./...
 - [Search bar - поисковая строка](search-bar/README.md)
 - [Visualizations - визуализация](visualizations/README.md)
 
-
+---
 
 ## 📁 Структура
 ```text

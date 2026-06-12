@@ -49,10 +49,6 @@
 
 ---
 
-
-
----
-
 ## 🧑‍💻 Авторы
 - Anuar Turlubay (@aturluba)
 - Evelina Penkova (@epenkova)

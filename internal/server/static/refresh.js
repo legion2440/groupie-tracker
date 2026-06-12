@@ -3,9 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('refresh-btn');
   if (!btn) return;
 
-  // Всплывашка, оставьте вашу реализацию
+  // Всплывашка
   function toast(msg, isErr=false){ 
-    // Можно заменить на красивое всплывающее окно
     console.log(isErr ? 'ERR:' : 'OK:', msg); 
   }
 
