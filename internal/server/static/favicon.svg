@@ -1,0 +1,36 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Vinyl Record Base -->
+  <g id="vinyl">
+    <circle cx="200" cy="200" fill="#111" r="185" stroke="#333" stroke-width="2"></circle>
+
+    <!-- Grooves -->
+    <circle cx="200" cy="200" fill="none" r="160" stroke="#222" stroke-width="1"></circle>
+    <circle cx="200" cy="200" fill="none" r="140" stroke="#222" stroke-width="1"></circle>
+    <circle cx="200" cy="200" fill="none" r="110" stroke="#222" stroke-width="1"></circle>
+
+    <!-- Large Center Label -->
+    <circle cx="200" cy="200" fill="#e60000" r="125"></circle>
+
+    <!-- Official Logo Style: AC [Lightning] DC -->
+    <g transform="translate(200, 200)">
+      <!-- Lightning Bolt in the middle -->
+      <path d="M0 -60 L-25 10 L0 10 L-25 70 L25 -10 L0 -10 L25 -60 Z" fill="#fff"></path>
+
+      <!-- AC on the left -->
+      <text fill="#fff" font-family="Arial, sans-serif" font-size="70" font-weight="900" text-anchor="end" x="-70" y="20">AC</text>
+
+      <!-- DC on the right -->
+      <text fill="#fff" font-family="Arial, sans-serif" font-size="70" font-weight="900" text-anchor="start" x="70" y="20">DC</text>
+    </g>
+
+  </g>
+
+  <!-- Subtle Depth Reflection -->
+  <path d="M200 40 Q 320 40 360 200"
+        fill="none"
+        stroke="white"
+        stroke-linecap="round"
+        stroke-opacity="0.1"
+        stroke-width="15">
+  </path>
+</svg>
