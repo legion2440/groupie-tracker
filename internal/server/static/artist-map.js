@@ -3,9 +3,51 @@
 const MAP_VIEWBOX_WIDTH = 1000;
 const MAP_VIEWBOX_HEIGHT = 500;
 const MAP_ASPECT_RATIO = MAP_VIEWBOX_WIDTH / MAP_VIEWBOX_HEIGHT;
+const TOUR_MAP_MIN_ZOOM = 1;
+const TOUR_MAP_MAX_ZOOM = 3;
+const TOUR_MAP_SINGLE_POINT_ZOOM = 3;
+const TOUR_MAP_PADDING_RATIO = 0.12;
+const TOUR_MAP_MIN_GEO_SPAN_DEGREES = 1;
+const TOUR_MAP_WORLD_ZOOM_EPSILON = 0.08;
+const TOUR_MAP_GLOBAL_LONGITUDE_SPAN_DEGREES = 120;
+const TOUR_MAP_LAND_EDGE_REPEAT_RATIO = 0.20;
+const TOUR_MAP_FLOAT_EPSILON = 0.000001;
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function getDefaultTourCamera() {
+  return {
+    centerX: MAP_VIEWBOX_WIDTH / 2,
+    centerY: MAP_VIEWBOX_HEIGHT / 2,
+    zoom: TOUR_MAP_MIN_ZOOM,
+  };
+}
+
+function normalizeViewBoxX(x) {
+  const normalized = x % MAP_VIEWBOX_WIDTH;
+
+  return normalized < 0
+    ? normalized + MAP_VIEWBOX_WIDTH
+    : normalized;
+}
+
+function getViewportSize(viewportOrWidth, viewportHeight) {
+  if (
+    viewportOrWidth &&
+    typeof viewportOrWidth === "object"
+  ) {
+    return {
+      width: Number(viewportOrWidth.clientWidth) || 0,
+      height: Number(viewportOrWidth.clientHeight) || 0,
+    };
+  }
+
+  return {
+    width: Number(viewportOrWidth) || 0,
+    height: Number(viewportHeight) || 0,
+  };
 }
 
 function projectGeoToViewBox(latitude, longitude) {
@@ -18,52 +60,351 @@ function projectGeoToViewBox(latitude, longitude) {
   };
 }
 
-function getContainedMapRect(viewport) {
-  const viewportWidth = Number(viewport.clientWidth) || 0;
-  const viewportHeight = Number(viewport.clientHeight) || 0;
+function getContainedMapRectForSize(viewportWidth, viewportHeight) {
+  const width = Number(viewportWidth) || 0;
+  const height = Number(viewportHeight) || 0;
 
-  if (viewportWidth <= 0 || viewportHeight <= 0) {
+  if (width <= 0 || height <= 0) {
     return { left: 0, top: 0, width: 0, height: 0 };
   }
 
-  const viewportAspect = viewportWidth / viewportHeight;
+  const viewportAspect = width / height;
 
   if (viewportAspect > MAP_ASPECT_RATIO) {
-    const height = viewportHeight;
-    const width = height * MAP_ASPECT_RATIO;
+    const containedHeight = height;
+    const containedWidth = containedHeight * MAP_ASPECT_RATIO;
 
     return {
-      left: (viewportWidth - width) / 2,
+      left: (width - containedWidth) / 2,
       top: 0,
-      width,
-      height,
+      width: containedWidth,
+      height: containedHeight,
     };
   }
 
-  const width = viewportWidth;
-  const height = width / MAP_ASPECT_RATIO;
+  const containedWidth = width;
+  const containedHeight = containedWidth / MAP_ASPECT_RATIO;
 
   return {
     left: 0,
-    top: (viewportHeight - height) / 2,
-    width,
-    height,
+    top: (height - containedHeight) / 2,
+    width: containedWidth,
+    height: containedHeight,
+  };
+}
+
+function getContainedMapRect(viewport) {
+  const size = getViewportSize(viewport);
+
+  return getContainedMapRectForSize(size.width, size.height);
+}
+
+function getCameraZoom(camera) {
+  return clamp(
+    Number(camera && camera.zoom) || TOUR_MAP_MIN_ZOOM,
+    TOUR_MAP_MIN_ZOOM,
+    TOUR_MAP_MAX_ZOOM
+  );
+}
+
+function wrapViewBoxXToCamera(x, centerX) {
+  let wrappedX = x;
+
+  while (wrappedX - centerX > MAP_VIEWBOX_WIDTH / 2) {
+    wrappedX -= MAP_VIEWBOX_WIDTH;
+  }
+
+  while (wrappedX - centerX < -MAP_VIEWBOX_WIDTH / 2) {
+    wrappedX += MAP_VIEWBOX_WIDTH;
+  }
+
+  return wrappedX;
+}
+
+function getLocationCoordinate(location) {
+  const source = location && location.coordinate
+    ? location.coordinate
+    : location;
+  const latitude = Number(source && source.latitude);
+  const longitude = Number(source && source.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return null;
+  }
+
+  return {
+    latitude: clamp(latitude, -90, 90),
+    longitude: clamp(longitude, -180, 180),
+  };
+}
+
+function getSmallestCircularViewBoxInterval(points) {
+  const sorted = points
+    .map(normalizeViewBoxX)
+    .sort((a, b) => a - b);
+
+  if (sorted.length === 0) {
+    return {
+      center: MAP_VIEWBOX_WIDTH / 2,
+      span: MAP_VIEWBOX_WIDTH,
+    };
+  }
+
+  if (sorted.length === 1) {
+    return {
+      center: sorted[0],
+      span: 0,
+    };
+  }
+
+  let largestGap = -1;
+  let largestGapIndex = 0;
+
+  sorted.forEach((point, index) => {
+    const next =
+      index === sorted.length - 1
+        ? sorted[0] + MAP_VIEWBOX_WIDTH
+        : sorted[index + 1];
+    const gap = next - point;
+
+    if (gap > largestGap) {
+      largestGap = gap;
+      largestGapIndex = index;
+    }
+  });
+
+  const startIndex =
+    (largestGapIndex + 1) % sorted.length;
+  const start = sorted[startIndex];
+  let end = sorted[largestGapIndex];
+
+  if (end < start) {
+    end += MAP_VIEWBOX_WIDTH;
+  }
+
+  const span = end - start;
+
+  return {
+    center: normalizeViewBoxX(start + span / 2),
+    span,
+  };
+}
+
+function computeTourCamera(
+  locations,
+  viewportWidth,
+  viewportHeight
+) {
+  const coordinates = (Array.isArray(locations) ? locations : [])
+    .map(getLocationCoordinate)
+    .filter(Boolean);
+  const viewportSize = getViewportSize(
+    viewportWidth,
+    viewportHeight
+  );
+  const mapRect = getContainedMapRectForSize(
+    viewportSize.width,
+    viewportSize.height
+  );
+
+  if (
+    coordinates.length === 0 ||
+    mapRect.width <= 0 ||
+    mapRect.height <= 0
+  ) {
+    return getDefaultTourCamera();
+  }
+
+  if (coordinates.length === 1) {
+    const point = projectGeoToViewBox(
+      coordinates[0].latitude,
+      coordinates[0].longitude
+    );
+
+    return {
+      centerX: normalizeViewBoxX(point.x),
+      centerY: point.y,
+      zoom: clamp(
+        TOUR_MAP_SINGLE_POINT_ZOOM,
+        TOUR_MAP_MIN_ZOOM,
+        TOUR_MAP_MAX_ZOOM
+      ),
+    };
+  }
+
+  const projectedPoints = coordinates.map((coordinate) => (
+    projectGeoToViewBox(
+      coordinate.latitude,
+      coordinate.longitude
+    )
+  ));
+  const longitudeInterval = getSmallestCircularViewBoxInterval(
+    projectedPoints.map((point) => point.x)
+  );
+  const latitudeValues = projectedPoints.map((point) => point.y);
+  const minY = Math.min(...latitudeValues);
+  const maxY = Math.max(...latitudeValues);
+  const minLongitudeSpan =
+    (TOUR_MAP_MIN_GEO_SPAN_DEGREES / 360) *
+    MAP_VIEWBOX_WIDTH;
+  const minLatitudeSpan =
+    (TOUR_MAP_MIN_GEO_SPAN_DEGREES / 180) *
+    MAP_VIEWBOX_HEIGHT;
+  const spanX = Math.max(
+    longitudeInterval.span,
+    minLongitudeSpan
+  );
+  const spanY = Math.max(maxY - minY, minLatitudeSpan);
+  const globalLongitudeSpan =
+    (TOUR_MAP_GLOBAL_LONGITUDE_SPAN_DEGREES / 360) *
+    MAP_VIEWBOX_WIDTH;
+
+  if (
+    longitudeInterval.span + TOUR_MAP_FLOAT_EPSILON >=
+    globalLongitudeSpan
+  ) {
+    return getDefaultTourCamera();
+  }
+
+  const availableWidth = viewportSize.width *
+    (1 - TOUR_MAP_PADDING_RATIO * 2);
+  const availableHeight = viewportSize.height *
+    (1 - TOUR_MAP_PADDING_RATIO * 2);
+  const mapScale = mapRect.width / MAP_VIEWBOX_WIDTH;
+  const zoomX = availableWidth / (spanX * mapScale);
+  const zoomY = availableHeight / (spanY * mapScale);
+  let zoom = Math.min(zoomX, zoomY);
+
+  if (!Number.isFinite(zoom)) {
+    return getDefaultTourCamera();
+  }
+
+  zoom = clamp(
+    zoom,
+    TOUR_MAP_MIN_ZOOM,
+    TOUR_MAP_MAX_ZOOM
+  );
+
+  if (zoom <= TOUR_MAP_MIN_ZOOM + TOUR_MAP_WORLD_ZOOM_EPSILON) {
+    return getDefaultTourCamera();
+  }
+
+  return {
+    centerX: longitudeInterval.center,
+    centerY: (minY + maxY) / 2,
+    zoom,
+  };
+}
+
+function projectGeoWithCamera(
+  latitude,
+  longitude,
+  camera,
+  viewportWidth,
+  viewportHeight
+) {
+  const viewBoxPoint = projectGeoToViewBox(latitude, longitude);
+  const viewportSize = getViewportSize(
+    viewportWidth,
+    viewportHeight
+  );
+  const mapRect = getContainedMapRectForSize(
+    viewportSize.width,
+    viewportSize.height
+  );
+  const fallbackCamera = getDefaultTourCamera();
+  const centerX = Number.isFinite(Number(camera && camera.centerX))
+    ? Number(camera.centerX)
+    : fallbackCamera.centerX;
+  const centerY = Number.isFinite(Number(camera && camera.centerY))
+    ? Number(camera.centerY)
+    : fallbackCamera.centerY;
+  const zoom = getCameraZoom(camera || fallbackCamera);
+  const mapScale = mapRect.width / MAP_VIEWBOX_WIDTH;
+  const wrappedX = wrapViewBoxXToCamera(
+    viewBoxPoint.x,
+    centerX
+  );
+
+  return {
+    x: viewportSize.width / 2 +
+      (wrappedX - centerX) * mapScale * zoom,
+
+    y: viewportSize.height / 2 +
+      (viewBoxPoint.y - centerY) * mapScale * zoom,
   };
 }
 
 function projectGeoToViewport(latitude, longitude, viewport) {
-  const viewBoxPoint = projectGeoToViewBox(latitude, longitude);
-  const mapRect = getContainedMapRect(viewport);
+  return projectGeoWithCamera(
+    latitude,
+    longitude,
+    getDefaultTourCamera(),
+    viewport
+  );
+}
 
-  return {
-    x:
-      mapRect.left +
-      (viewBoxPoint.x / MAP_VIEWBOX_WIDTH) * mapRect.width,
+function shouldRepeatLandWorld(camera) {
+  const centerX = normalizeViewBoxX(
+    Number(camera && camera.centerX) || 0
+  );
 
-    y:
-      mapRect.top +
-      (viewBoxPoint.y / MAP_VIEWBOX_HEIGHT) * mapRect.height,
-  };
+  return getCameraZoom(camera) > TOUR_MAP_MIN_ZOOM &&
+    (
+      centerX < MAP_VIEWBOX_WIDTH * TOUR_MAP_LAND_EDGE_REPEAT_RATIO ||
+      centerX > MAP_VIEWBOX_WIDTH *
+        (1 - TOUR_MAP_LAND_EDGE_REPEAT_RATIO)
+    );
+}
+
+function applyLandCamera(landLayer, camera, viewport) {
+  const viewportSize = getViewportSize(viewport);
+  const mapRect = getContainedMapRectForSize(
+    viewportSize.width,
+    viewportSize.height
+  );
+
+  if (
+    !landLayer ||
+    mapRect.width <= 0 ||
+    mapRect.height <= 0
+  ) {
+    return;
+  }
+
+  const repeatWorld = shouldRepeatLandWorld(camera);
+  const zoom = getCameraZoom(camera);
+  const layerLeft = repeatWorld
+    ? mapRect.left - mapRect.width
+    : mapRect.left;
+  const layerWidth = repeatWorld
+    ? mapRect.width * 3
+    : mapRect.width;
+  const localWorldOffset = repeatWorld
+    ? mapRect.width
+    : 0;
+  const mapScale = mapRect.width / MAP_VIEWBOX_WIDTH;
+  const centerX = Number(camera.centerX);
+  const centerY = Number(camera.centerY);
+  const translateX = viewportSize.width / 2 -
+    centerX * mapScale * zoom -
+    layerLeft -
+    localWorldOffset * zoom;
+  const translateY = viewportSize.height / 2 -
+    centerY * mapScale * zoom -
+    mapRect.top;
+
+  landLayer.classList.toggle("is-world-repeat", repeatWorld);
+  landLayer.style.left = `${layerLeft}px`;
+  landLayer.style.top = `${mapRect.top}px`;
+  landLayer.style.right = "auto";
+  landLayer.style.bottom = "auto";
+  landLayer.style.width = `${layerWidth}px`;
+  landLayer.style.height = `${mapRect.height}px`;
+  landLayer.style.transformOrigin = "0 0";
+  landLayer.style.transform =
+    `matrix(${zoom}, 0, 0, ${zoom}, ` +
+    `${translateX}, ${translateY})`;
 }
 
 function readLocationCoordinate(card) {
@@ -238,6 +579,10 @@ function initArtistMap() {
     ".tour-map__markers"
   );
 
+  const landLayer = document.querySelector(
+    ".tour-map__land"
+  );
+
   const routePath = document.querySelector(
     ".tour-map__route"
   );
@@ -246,7 +591,14 @@ function initArtistMap() {
     ".tour-map__plane"
   );
 
-  if (!cards.length || !viewport || !markerLayer || !routePath || !plane) {
+  if (
+    !cards.length ||
+    !viewport ||
+    !markerLayer ||
+    !landLayer ||
+    !routePath ||
+    !plane
+  ) {
     return;
   }
 
@@ -259,6 +611,7 @@ function initArtistMap() {
   let isFlying = false;
   let animationFrameId = null;
   let lastRoute = null;
+  let camera = getDefaultTourCamera();
 
   const locations = cards.map((card, index) => {
     const locationIndex = Number(card.dataset.locationIndex || index);
@@ -314,11 +667,21 @@ function initArtistMap() {
     ));
   }
 
+  function updateCamera() {
+    camera = computeTourCamera(
+      locations.map((location) => location.coordinate),
+      viewport
+    );
+
+    applyLandCamera(landLayer, camera, viewport);
+  }
+
   function placeMarkers() {
     markers.forEach((marker) => {
-      const position = projectGeoToViewport(
+      const position = projectGeoWithCamera(
         marker.dataset.latitude,
         marker.dataset.longitude,
+        camera,
         viewport
       );
 
@@ -583,6 +946,7 @@ function initArtistMap() {
   });
 
   const resizeObserver = new ResizeObserver(() => {
+    updateCamera();
     placeMarkers();
 
     if (isFlying) {
@@ -612,6 +976,7 @@ function initArtistMap() {
     placePlaneAtMarker(currentIndex);
   });
 
+  updateCamera();
   placeMarkers();
   placePlaneAtMarker(0);
   plane.dataset.currentLocationIndex = "0";
@@ -628,8 +993,15 @@ if (typeof document !== "undefined") {
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
+    TOUR_MAP_MAX_ZOOM,
+    TOUR_MAP_MIN_ZOOM,
+    TOUR_MAP_PADDING_RATIO,
+    TOUR_MAP_SINGLE_POINT_ZOOM,
+    computeTourCamera,
     getContainedMapRect,
+    getContainedMapRectForSize,
     projectGeoToViewBox,
     projectGeoToViewport,
+    projectGeoWithCamera,
   };
 }

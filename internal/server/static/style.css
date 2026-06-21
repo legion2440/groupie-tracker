@@ -2337,7 +2337,19 @@ html:not(.theme-dark) .tour-map {
     center / contain
     no-repeat;
 
+  transform-origin: 0 0;
   pointer-events: none;
+  will-change: transform;
+}
+
+.tour-map__land.is-world-repeat {
+  -webkit-mask-position: left center;
+  -webkit-mask-repeat: repeat-x;
+  -webkit-mask-size: calc(100% / 3) 100%;
+
+  mask-position: left center;
+  mask-repeat: repeat-x;
+  mask-size: calc(100% / 3) 100%;
 }
 
 html:not(.theme-dark) .tour-map__land {
