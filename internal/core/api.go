@@ -12,13 +12,16 @@ import (
 )
 
 const (
-	artistsURL          = "https://groupietrackers.herokuapp.com/api/artists"
-	locationsURL        = "https://groupietrackers.herokuapp.com/api/locations"
-	datesURL            = "https://groupietrackers.herokuapp.com/api/dates"
-	relationsURL        = "https://groupietrackers.herokuapp.com/api/relation"
 	connectTimeout      = 3 * time.Second  // Dial (нет сети → ошибка)
 	headerTimeout       = 8 * time.Second  // сервер «просыпается»
 	overallRequestLimit = 30 * time.Second // всё вместе
+)
+
+var (
+	artistsURL   = "https://groupietrackers.herokuapp.com/api/artists"
+	locationsURL = "https://groupietrackers.herokuapp.com/api/locations"
+	datesURL     = "https://groupietrackers.herokuapp.com/api/dates"
+	relationsURL = "https://groupietrackers.herokuapp.com/api/relation"
 )
 
 // httpClient ограничивает время подключения и полный отклик.

@@ -14,6 +14,7 @@ import (
 
 	"groupie-tracker/internal/catalog"
 	"groupie-tracker/internal/core"
+	"groupie-tracker/internal/geocode"
 	"groupie-tracker/internal/model"
 )
 
@@ -49,8 +50,10 @@ type QueryState struct {
 }
 
 type ConcertsByLocation struct {
-	Location string
-	Dates    []string
+	Location  string
+	Dates     []string
+	Latitude  float64
+	Longitude float64
 }
 
 type ArtistDetailPage struct {
@@ -61,6 +64,13 @@ type ArtistDetailPage struct {
 type dateWrap struct {
 	raw string
 	t   time.Time
+}
+
+type concertLocationSortItem struct {
+	concert            ConcertsByLocation
+	normalizedLocation string
+	firstDate          time.Time
+	hasDate            bool
 }
 
 /*──────────────────── шаблоны (init) ───────────────────────*/
@@ -210,7 +220,13 @@ func serveLegacyArtistRedirect(w http.ResponseWriter, r *http.Request, loadCatal
 	http.Redirect(w, r, "/"+slug, http.StatusMovedPermanently)
 }
 
-func serveArtistSlug(w http.ResponseWriter, r *http.Request, loadCatalog catalogLoaderFunc, loadRelations relationLoaderFunc) {
+func serveArtistSlug(
+	w http.ResponseWriter,
+	r *http.Request,
+	loadCatalog catalogLoaderFunc,
+	loadRelations relationLoaderFunc,
+	lookupCoordinate coordinateLookupFunc,
+) {
 	slug := strings.Trim(path.Clean(r.URL.Path), "/")
 	if slug == "" || strings.Contains(slug, "/") {
 		renderError(w, 404, "Страницы не существует")
@@ -233,19 +249,48 @@ func serveArtistSlug(w http.ResponseWriter, r *http.Request, loadCatalog catalog
 		return
 	}
 
-	renderArtistDetail(w, entry, loadRelations)
+	renderArtistDetail(w, entry, loadRelations, lookupCoordinate)
 }
 
 type relationLoaderFunc func() ([]model.Relation, error)
+type coordinateLookupFunc func(rawLocation string) (geocode.Coordinate, bool)
 
-func renderArtistDetail(w http.ResponseWriter, artist catalog.ArtistEntry, loadRelations relationLoaderFunc) {
+func renderArtistDetail(
+	w http.ResponseWriter,
+	artist catalog.ArtistEntry,
+	loadRelations relationLoaderFunc,
+	lookupCoordinate coordinateLookupFunc,
+) {
 	relations, err := loadRelations()
 	if err != nil {
-		relations = nil
+		log.Printf("load artist relations for %d: %v", artist.ID, err)
+		renderError(w, http.StatusInternalServerError, "Ошибка загрузки концертов")
+		return
 	}
-	var concerts []ConcertsByLocation
+
+	concerts, err := buildConcertsByLocation(artist.ID, relations, lookupCoordinate)
+	if err != nil {
+		log.Printf("build artist concerts for %d: %v", artist.ID, err)
+		renderError(w, http.StatusInternalServerError, "Ошибка загрузки координат концертов")
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmplAll.ExecuteTemplate(w, "artist.html", ArtistDetailPage{artistDetailModel(artist), concerts})
+}
+
+func buildConcertsByLocation(
+	artistID int,
+	relations []model.Relation,
+	lookupCoordinate coordinateLookupFunc,
+) ([]ConcertsByLocation, error) {
+	if lookupCoordinate == nil {
+		return nil, fmt.Errorf("coordinate lookup is not configured")
+	}
+
+	items := make([]concertLocationSortItem, 0)
 	for _, rel := range relations {
-		if rel.ID != artist.ID {
+		if rel.ID != artistID {
 			continue
 		}
 		for rawCity, rawDates := range rel.DatesLocations {
@@ -253,21 +298,57 @@ func renderArtistDetail(w http.ResponseWriter, artist catalog.ArtistEntry, loadR
 			dw := make([]dateWrap, 0, len(rawDates))
 			for _, d := range rawDates {
 				d = strings.TrimPrefix(d, "*")
-				if t, err := time.Parse("02-01-2006", d); err == nil {
-					dw = append(dw, dateWrap{raw: d, t: t})
+				t, err := time.ParseInLocation("02-01-2006", d, time.UTC)
+				if err != nil {
+					return nil, fmt.Errorf("parse concert date %q for %s: %w", d, rawCity, err)
 				}
+				dw = append(dw, dateWrap{raw: d, t: t})
 			}
 			sort.Slice(dw, func(i, j int) bool { return dw[i].t.Before(dw[j].t) })
 			dates := make([]string, len(dw))
 			for i, v := range dw {
 				dates[i] = v.raw
 			}
-			concerts = append(concerts, ConcertsByLocation{city, dates})
+
+			coordinate, ok := lookupCoordinate(rawCity)
+			if !ok {
+				return nil, fmt.Errorf("missing coordinates for %s (%s)", city, rawCity)
+			}
+
+			item := concertLocationSortItem{
+				concert: ConcertsByLocation{
+					Location:  city,
+					Dates:     dates,
+					Latitude:  coordinate.Latitude,
+					Longitude: coordinate.Longitude,
+				},
+				normalizedLocation: geocode.NormalizeLocationKey(rawCity),
+			}
+			if len(dw) > 0 {
+				item.firstDate = dw[0].t
+				item.hasDate = true
+			}
+			items = append(items, item)
 		}
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tmplAll.ExecuteTemplate(w, "artist.html", ArtistDetailPage{artistDetailModel(artist), concerts})
+	sort.Slice(items, func(i, j int) bool {
+		left := items[i]
+		right := items[j]
+		if left.hasDate != right.hasDate {
+			return left.hasDate
+		}
+		if left.hasDate && !left.firstDate.Equal(right.firstDate) {
+			return left.firstDate.Before(right.firstDate)
+		}
+		return left.normalizedLocation < right.normalizedLocation
+	})
+
+	concerts := make([]ConcertsByLocation, len(items))
+	for i, item := range items {
+		concerts[i] = item.concert
+	}
+	return concerts, nil
 }
 
 func artistDetailModel(artist catalog.ArtistEntry) model.Artist {

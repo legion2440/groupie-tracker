@@ -251,6 +251,15 @@
             </svg>
           </div>
         </div>
+
+        <p class="tour-map__geocoding-attribution">
+          Geocoding &copy;
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noopener noreferrer"
+          >OpenStreetMap contributors</a>
+        </p>
       </div>
 
       <aside
@@ -270,6 +279,8 @@
               <article
                 class="concert-location{{ if eq $index 0 }} is-active{{ end }}"
                 data-location-index="{{ $index }}"
+                data-latitude="{{ printf "%.6f" $concert.Latitude }}"
+                data-longitude="{{ printf "%.6f" $concert.Longitude }}"
                 role="button"
                 tabindex="0"
                 aria-pressed="{{ if eq $index 0 }}true{{ else }}false{{ end }}"

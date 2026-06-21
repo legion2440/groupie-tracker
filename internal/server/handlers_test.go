@@ -752,7 +752,12 @@ func renderArtistDetailTemplate(t *testing.T) string {
 			FirstAlbum:   "10-01-1995",
 		},
 		Concerts: []ConcertsByLocation{
-			{Location: "Seattle, Washington, USA", Dates: []string{"10-01-1995"}},
+			{
+				Location:  "Seattle, Washington, USA",
+				Dates:     []string{"10-01-1995"},
+				Latitude:  47.6062,
+				Longitude: -122.3321,
+			},
 		},
 	})
 	if err != nil {

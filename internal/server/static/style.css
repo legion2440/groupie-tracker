@@ -2311,7 +2311,7 @@ html:not(.theme-dark) .tour-map {
 
 .tour-map__viewport {
   position: absolute;
-  inset: 104px 24px 24px;
+  inset: 104px 24px 52px;
 
   overflow: hidden;
 }
@@ -2535,6 +2535,37 @@ html:not(.theme-dark) .tour-map__land {
   height: 100%;
 
   fill: currentColor;
+}
+
+.tour-map__geocoding-attribution {
+  position: absolute;
+  z-index: 4;
+  right: 24px;
+  bottom: 16px;
+
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: 9999px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--surface-container-highest) 88%,
+      transparent
+    );
+  color: var(--on-surface-variant);
+
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.tour-map__geocoding-attribution a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
 .concert-panel {
@@ -3002,7 +3033,15 @@ html:not(.theme-dark) .concert-location {
   }
 
   .tour-map__viewport {
-    inset: 84px 12px 12px;
+    inset: 84px 12px 44px;
+  }
+
+  .tour-map__geocoding-attribution {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100% - 24px);
+    font-size: 10px;
+    overflow-wrap: anywhere;
   }
 
   .tour-map__plane {

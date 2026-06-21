@@ -1,34 +1,80 @@
 "use strict";
 
-const TEMPORARY_MAP_POSITIONS = [
-  { x: 21, y: 37 },
-  { x: 28, y: 68 },
-  { x: 47, y: 31 },
-  { x: 51, y: 55 },
-  { x: 65, y: 34 },
-  { x: 76, y: 49 },
-  { x: 84, y: 70 },
-  { x: 56, y: 22 },
-  { x: 17, y: 52 },
-  { x: 34, y: 45 },
-  { x: 44, y: 68 },
-  { x: 59, y: 43 },
-  { x: 70, y: 61 },
-  { x: 88, y: 42 },
-  { x: 73, y: 26 },
-  { x: 39, y: 26 },
-  { x: 25, y: 29 },
-  { x: 32, y: 78 },
-  { x: 62, y: 72 },
-  { x: 81, y: 58 },
-];
+const MAP_VIEWBOX_WIDTH = 1000;
+const MAP_VIEWBOX_HEIGHT = 500;
+const MAP_ASPECT_RATIO = MAP_VIEWBOX_WIDTH / MAP_VIEWBOX_HEIGHT;
 
-// Temporary visual placeholders only. Replace this lookup with backend-supplied
-// coordinates later; these positions do not represent the real concert cities.
-function getTemporaryPosition(index) {
-  return TEMPORARY_MAP_POSITIONS[
-    index % TEMPORARY_MAP_POSITIONS.length
-  ];
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function projectGeoToViewBox(latitude, longitude) {
+  const lat = clamp(Number(latitude), -90, 90);
+  const lon = clamp(Number(longitude), -180, 180);
+
+  return {
+    x: ((lon + 180) / 360) * MAP_VIEWBOX_WIDTH,
+    y: ((90 - lat) / 180) * MAP_VIEWBOX_HEIGHT,
+  };
+}
+
+function getContainedMapRect(viewport) {
+  const viewportWidth = Number(viewport.clientWidth) || 0;
+  const viewportHeight = Number(viewport.clientHeight) || 0;
+
+  if (viewportWidth <= 0 || viewportHeight <= 0) {
+    return { left: 0, top: 0, width: 0, height: 0 };
+  }
+
+  const viewportAspect = viewportWidth / viewportHeight;
+
+  if (viewportAspect > MAP_ASPECT_RATIO) {
+    const height = viewportHeight;
+    const width = height * MAP_ASPECT_RATIO;
+
+    return {
+      left: (viewportWidth - width) / 2,
+      top: 0,
+      width,
+      height,
+    };
+  }
+
+  const width = viewportWidth;
+  const height = width / MAP_ASPECT_RATIO;
+
+  return {
+    left: 0,
+    top: (viewportHeight - height) / 2,
+    width,
+    height,
+  };
+}
+
+function projectGeoToViewport(latitude, longitude, viewport) {
+  const viewBoxPoint = projectGeoToViewBox(latitude, longitude);
+  const mapRect = getContainedMapRect(viewport);
+
+  return {
+    x:
+      mapRect.left +
+      (viewBoxPoint.x / MAP_VIEWBOX_WIDTH) * mapRect.width,
+
+    y:
+      mapRect.top +
+      (viewBoxPoint.y / MAP_VIEWBOX_HEIGHT) * mapRect.height,
+  };
+}
+
+function readLocationCoordinate(card) {
+  const latitude = Number(card.dataset.latitude);
+  const longitude = Number(card.dataset.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return null;
+  }
+
+  return { latitude, longitude };
 }
 
 function getMarkerCenter(marker, viewport) {
@@ -214,26 +260,47 @@ function initArtistMap() {
   let animationFrameId = null;
   let lastRoute = null;
 
+  const locations = cards.map((card, index) => {
+    const locationIndex = Number(card.dataset.locationIndex || index);
+    const coordinate = readLocationCoordinate(card);
+
+    if (!coordinate) {
+      return null;
+    }
+
+    return {
+      card,
+      locationIndex,
+      coordinate,
+    };
+  });
+
+  if (locations.some((location) => location === null)) {
+    console.error("Tour map location is missing coordinates.");
+    return;
+  }
+
   markerLayer.replaceChildren();
 
-  const markers = cards.map((card, index) => {
-    const locationIndex = Number(card.dataset.locationIndex || index);
-    const position = getTemporaryPosition(locationIndex);
+  const markers = locations.map((location) => {
     const marker = document.createElement("span");
 
     marker.className = "tour-map__marker";
-    marker.dataset.locationIndex = String(locationIndex);
-    marker.style.left = `${position.x}%`;
-    marker.style.top = `${position.y}%`;
+    marker.dataset.locationIndex = String(location.locationIndex);
+    marker.dataset.latitude = String(location.coordinate.latitude);
+    marker.dataset.longitude = String(location.coordinate.longitude);
 
-    if (locationIndex === 0) {
+    if (location.locationIndex === 0) {
       marker.classList.add("is-active");
     }
 
-    card.classList.toggle("is-active", locationIndex === 0);
-    card.setAttribute(
+    location.card.classList.toggle(
+      "is-active",
+      location.locationIndex === 0
+    );
+    location.card.setAttribute(
       "aria-pressed",
-      locationIndex === 0 ? "true" : "false"
+      location.locationIndex === 0 ? "true" : "false"
     );
 
     markerLayer.append(marker);
@@ -245,6 +312,19 @@ function initArtistMap() {
     return markers.find((marker) => (
       Number(marker.dataset.locationIndex) === index
     ));
+  }
+
+  function placeMarkers() {
+    markers.forEach((marker) => {
+      const position = projectGeoToViewport(
+        marker.dataset.latitude,
+        marker.dataset.longitude,
+        viewport
+      );
+
+      marker.style.left = `${position.x}px`;
+      marker.style.top = `${position.y}px`;
+    });
   }
 
   function getCard(index) {
@@ -503,6 +583,8 @@ function initArtistMap() {
   });
 
   const resizeObserver = new ResizeObserver(() => {
+    placeMarkers();
+
     if (isFlying) {
       completeActiveFlightImmediately();
       return;
@@ -530,13 +612,24 @@ function initArtistMap() {
     placePlaneAtMarker(currentIndex);
   });
 
+  placeMarkers();
   placePlaneAtMarker(0);
   plane.dataset.currentLocationIndex = "0";
   resizeObserver.observe(viewport);
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initArtistMap);
-} else {
-  initArtistMap();
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initArtistMap);
+  } else {
+    initArtistMap();
+  }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    getContainedMapRect,
+    projectGeoToViewBox,
+    projectGeoToViewport,
+  };
 }

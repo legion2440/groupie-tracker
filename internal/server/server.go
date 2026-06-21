@@ -11,18 +11,20 @@ import (
 )
 
 type dependencies struct {
-	updateNow     updateNowFunc
-	loadCatalog   catalogLoaderFunc
-	loadRelations relationLoaderFunc
-	previewLookup previewLookupFunc
+	updateNow        updateNowFunc
+	loadCatalog      catalogLoaderFunc
+	loadRelations    relationLoaderFunc
+	lookupCoordinate coordinateLookupFunc
+	previewLookup    previewLookupFunc
 }
 
 func InitRoutes() *http.ServeMux {
 	return initRoutes(dependencies{
-		updateNow:     core.UpdateNow,
-		loadCatalog:   loadCatalog,
-		loadRelations: core.GetRelations,
-		previewLookup: defaultDeezerPreviewService.Preview,
+		updateNow:        core.UpdateNow,
+		loadCatalog:      loadCatalog,
+		loadRelations:    core.GetRelations,
+		lookupCoordinate: core.LookupLocationCoordinate,
+		previewLookup:    defaultDeezerPreviewService.Preview,
 	})
 }
 
@@ -31,6 +33,9 @@ func initRoutes(deps dependencies) *http.ServeMux {
 		deps.loadRelations = func() ([]model.Relation, error) {
 			return nil, nil
 		}
+	}
+	if deps.lookupCoordinate == nil {
+		deps.lookupCoordinate = core.LookupLocationCoordinate
 	}
 	if deps.previewLookup == nil {
 		deps.previewLookup = defaultDeezerPreviewService.Preview
@@ -77,7 +82,7 @@ func initRoutes(deps dependencies) *http.ServeMux {
 			renderError(w, http.StatusNotFound, "Страница не найдена")
 			return
 		}
-		serveArtistSlug(w, r, deps.loadCatalog, deps.loadRelations)
+		serveArtistSlug(w, r, deps.loadCatalog, deps.loadRelations, deps.lookupCoordinate)
 	}) // последний, catch-all
 
 	return mux

@@ -1,0 +1,1517 @@
+{
+  "version": 1,
+  "locations": [
+    {
+      "key": "aalborg-denmark",
+      "location": "Aalborg, Denmark",
+      "latitude": 57.0462626,
+      "longitude": 9.9215263,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "aarhus-denmark",
+      "location": "Aarhus, Denmark",
+      "latitude": 56.1496278,
+      "longitude": 10.2134046,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "aberdeen-uk",
+      "location": "Aberdeen, UK",
+      "latitude": 57.1482429,
+      "longitude": -2.0928095,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "abu_dhabi-united_arab_emirates",
+      "location": "Abu Dhabi, United Arab Emirates",
+      "latitude": 24.4538352,
+      "longitude": 54.3774014,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "alabama-usa",
+      "location": "Alabama, USA",
+      "latitude": 33.2588817,
+      "longitude": -86.8295337,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "amityville-usa",
+      "location": "Amityville, USA",
+      "latitude": 40.2999051,
+      "longitude": -75.7365076,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "amsterdam-netherlands",
+      "location": "Amsterdam, Netherlands",
+      "latitude": 52.3730796,
+      "longitude": 4.8924534,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "anaheim-usa",
+      "location": "Anaheim, USA",
+      "latitude": 33.8347516,
+      "longitude": -117.911732,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "antwerp-belgium",
+      "location": "Antwerp, Belgium",
+      "latitude": 51.2211097,
+      "longitude": 4.3997081,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "arizona-usa",
+      "location": "Arizona, USA",
+      "latitude": 34.395342,
+      "longitude": -111.763275,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "arras-france",
+      "location": "Arras, France",
+      "latitude": 50.291048,
+      "longitude": 2.7772211,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "athens-greece",
+      "location": "Athens, Greece",
+      "latitude": 37.9755648,
+      "longitude": 23.7348324,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "atlanta-usa",
+      "location": "Atlanta, USA",
+      "latitude": 33.7544657,
+      "longitude": -84.3898151,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "auckland-new_zealand",
+      "location": "Auckland, New Zealand",
+      "latitude": -36.852095,
+      "longitude": 174.7631803,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "bangkok-thailand",
+      "location": "Bangkok, Thailand",
+      "latitude": 13.7524938,
+      "longitude": 100.4935089,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "barcelona-spain",
+      "location": "Barcelona, Spain",
+      "latitude": 41.3825802,
+      "longitude": 2.177073,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "belo_horizonte-brazil",
+      "location": "Belo Horizonte, Brazil",
+      "latitude": -19.9227318,
+      "longitude": -43.9450948,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "berlin-germany",
+      "location": "Berlin, Germany",
+      "latitude": 52.5173885,
+      "longitude": 13.3951309,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "berwyn-usa",
+      "location": "Berwyn, USA",
+      "latitude": 41.8505874,
+      "longitude": -87.7936685,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "bilbao-spain",
+      "location": "Bilbao, Spain",
+      "latitude": 43.2630018,
+      "longitude": -2.9350039,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "birmingham-uk",
+      "location": "Birmingham, UK",
+      "latitude": 52.4948994,
+      "longitude": -1.8518439,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "bogota-colombia",
+      "location": "Bogota, Colombia",
+      "latitude": 4.6533817,
+      "longitude": -74.0836331,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "boston-usa",
+      "location": "Boston, USA",
+      "latitude": 42.3588336,
+      "longitude": -71.0578303,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "boulogne_billancourt-france",
+      "location": "Boulogne Billancourt, France",
+      "latitude": 48.8356649,
+      "longitude": 2.240206,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "brasilia-brazil",
+      "location": "Brasilia, Brazil",
+      "latitude": -15.7939869,
+      "longitude": -47.8828,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "bratislava-slovakia",
+      "location": "Bratislava, Slovakia",
+      "latitude": 48.1516988,
+      "longitude": 17.1093063,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "brisbane-australia",
+      "location": "Brisbane, Australia",
+      "latitude": -27.4689623,
+      "longitude": 153.0235009,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "brixton-uk",
+      "location": "Brixton, UK",
+      "latitude": 51.4633914,
+      "longitude": -0.1148023,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "brooklyn-usa",
+      "location": "Brooklyn, USA",
+      "latitude": 40.6526006,
+      "longitude": -73.9497211,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "budapest-hungary",
+      "location": "Budapest, Hungary",
+      "latitude": 47.4813896,
+      "longitude": 19.1457723,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "buenos_aires-argentina",
+      "location": "Buenos Aires, Argentina",
+      "latitude": -34.6095579,
+      "longitude": -58.3887904,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "burriana-spain",
+      "location": "Burriana, Spain",
+      "latitude": 39.8876912,
+      "longitude": -0.0846321,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "burswood-australia",
+      "location": "Burswood, Australia",
+      "latitude": -31.9602196,
+      "longitude": 115.8962701,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "california-usa",
+      "location": "California, USA",
+      "latitude": 36.7014631,
+      "longitude": -118.755997,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "canton-usa",
+      "location": "Canton, USA",
+      "latitude": 40.7985464,
+      "longitude": -81.3749508,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "cardiff-uk",
+      "location": "Cardiff, UK",
+      "latitude": 51.4816546,
+      "longitude": -3.1791934,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "changzhou-china",
+      "location": "Changzhou, China",
+      "latitude": 31.8122623,
+      "longitude": 119.9691539,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "charlotte-usa",
+      "location": "Charlotte, USA",
+      "latitude": 35.2272086,
+      "longitude": -80.8430827,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "chicago-usa",
+      "location": "Chicago, USA",
+      "latitude": 41.8755616,
+      "longitude": -87.6244212,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "cincinnati-usa",
+      "location": "Cincinnati, USA",
+      "latitude": 39.1012809,
+      "longitude": -84.5127405,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "cleveland-usa",
+      "location": "Cleveland, USA",
+      "latitude": 41.4996574,
+      "longitude": -81.6936772,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "colorado-usa",
+      "location": "Colorado, USA",
+      "latitude": 38.7251776,
+      "longitude": -105.607716,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "columbia-usa",
+      "location": "Columbia, USA",
+      "latitude": 34.000754,
+      "longitude": -81.0352313,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "copenhagen-denmark",
+      "location": "Copenhagen, Denmark",
+      "latitude": 55.6867243,
+      "longitude": 12.5700724,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "cuxhaven-germany",
+      "location": "Cuxhaven, Germany",
+      "latitude": 53.86878,
+      "longitude": 8.698286,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "dallas-usa",
+      "location": "Dallas, USA",
+      "latitude": 32.7762719,
+      "longitude": -96.7968559,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "del_mar-usa",
+      "location": "Del Mar, USA",
+      "latitude": 32.9594891,
+      "longitude": -117.2653146,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "detroit-usa",
+      "location": "Detroit, USA",
+      "latitude": 42.3315509,
+      "longitude": -83.0466403,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "doha-qatar",
+      "location": "Doha, Qatar",
+      "latitude": 25.3108807,
+      "longitude": 51.5081812,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "dubai-united_arab_emirates",
+      "location": "Dubai, United Arab Emirates",
+      "latitude": 25.0742823,
+      "longitude": 55.1885387,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "dublin-ireland",
+      "location": "Dublin, Ireland",
+      "latitude": 53.3493795,
+      "longitude": -6.2605593,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "dunedin-new_zealand",
+      "location": "Dunedin, New Zealand",
+      "latitude": -45.8740984,
+      "longitude": 170.5035755,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "dusseldorf-germany",
+      "location": "Dusseldorf, Germany",
+      "latitude": 51.2254018,
+      "longitude": 6.7763137,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "eindhoven-netherlands",
+      "location": "Eindhoven, Netherlands",
+      "latitude": 51.4485569,
+      "longitude": 5.4501225,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "florence-italy",
+      "location": "Florence, Italy",
+      "latitude": 43.7697955,
+      "longitude": 11.2556404,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "florida-usa",
+      "location": "Florida, USA",
+      "latitude": 27.7567667,
+      "longitude": -81.4639835,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "frankfurt-germany",
+      "location": "Frankfurt, Germany",
+      "latitude": 50.1106444,
+      "longitude": 8.6820917,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "frauenfeld-switzerland",
+      "location": "Frauenfeld, Switzerland",
+      "latitude": 47.5561915,
+      "longitude": 8.8963347,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "freyming_merlebach-france",
+      "location": "Freyming Merlebach, France",
+      "latitude": 49.1469437,
+      "longitude": 6.8184829,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "gdynia-poland",
+      "location": "Gdynia, Poland",
+      "latitude": 54.5164982,
+      "longitude": 18.5402738,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "georgia-usa",
+      "location": "Georgia, USA",
+      "latitude": 32.3293809,
+      "longitude": -83.1137366,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "glasgow-uk",
+      "location": "Glasgow, UK",
+      "latitude": 55.861155,
+      "longitude": -4.2501687,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "gothenburg-sweden",
+      "location": "Gothenburg, Sweden",
+      "latitude": 57.7072326,
+      "longitude": 11.9670171,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "grand_rapids-usa",
+      "location": "Grand Rapids, USA",
+      "latitude": 42.9632425,
+      "longitude": -85.6678639,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "groningen-netherlands",
+      "location": "Groningen, Netherlands",
+      "latitude": 53.2190652,
+      "longitude": 6.5680077,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "hamburg-germany",
+      "location": "Hamburg, Germany",
+      "latitude": 53.5501721,
+      "longitude": 10.0013165,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "hershey-usa",
+      "location": "Hershey, USA",
+      "latitude": 40.2850285,
+      "longitude": -76.6534662,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "hong_kong-china",
+      "location": "Hong Kong, China",
+      "latitude": 22.3492155,
+      "longitude": 114.1857978,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "houston-usa",
+      "location": "Houston, USA",
+      "latitude": 29.7589382,
+      "longitude": -95.3676974,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "huizhou-china",
+      "location": "Huizhou, China",
+      "latitude": 23.1125153,
+      "longitude": 114.4127007,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "illinois-usa",
+      "location": "Illinois, USA",
+      "latitude": 40.0796606,
+      "longitude": -89.4337288,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "imola-italy",
+      "location": "Imola, Italy",
+      "latitude": 44.3535145,
+      "longitude": 11.7141233,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "indianapolis-usa",
+      "location": "Indianapolis, USA",
+      "latitude": 39.7683331,
+      "longitude": -86.1583502,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "inglewood-usa",
+      "location": "Inglewood, USA",
+      "latitude": 33.9562003,
+      "longitude": -118.353132,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "jakarta-indonesia",
+      "location": "Jakarta, Indonesia",
+      "latitude": -6.1754049,
+      "longitude": 106.827168,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "kansas_city-usa",
+      "location": "Kansas City, USA",
+      "latitude": 39.100105,
+      "longitude": -94.5781416,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "klagenfurt-austria",
+      "location": "Klagenfurt, Austria",
+      "latitude": 46.623943,
+      "longitude": 14.3075976,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "krakow-poland",
+      "location": "Krakow, Poland",
+      "latitude": 50.0469432,
+      "longitude": 19.9971534,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "la_plata-argentina",
+      "location": "La Plata, Argentina",
+      "latitude": -34.9206797,
+      "longitude": -57.9537638,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "landgraaf-netherlands",
+      "location": "Landgraaf, Netherlands",
+      "latitude": 50.9024566,
+      "longitude": 6.0293103,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "las_vegas-usa",
+      "location": "Las Vegas, USA",
+      "latitude": 36.1674263,
+      "longitude": -115.1484131,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "lausanne-switzerland",
+      "location": "Lausanne, Switzerland",
+      "latitude": 46.5218269,
+      "longitude": 6.6327025,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "leipzig-germany",
+      "location": "Leipzig, Germany",
+      "latitude": 51.3406321,
+      "longitude": 12.3747329,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "lima-peru",
+      "location": "Lima, Peru",
+      "latitude": -12.0459808,
+      "longitude": -77.0305912,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "lisbon-portugal",
+      "location": "Lisbon, Portugal",
+      "latitude": 38.7077507,
+      "longitude": -9.1365919,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "london-uk",
+      "location": "London, UK",
+      "latitude": 51.5074456,
+      "longitude": -0.1277653,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "los_angeles-usa",
+      "location": "Los Angeles, USA",
+      "latitude": 34.0536909,
+      "longitude": -118.242766,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "lyon-france",
+      "location": "Lyon, France",
+      "latitude": 45.7578137,
+      "longitude": 4.8320114,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "madison-usa",
+      "location": "Madison, USA",
+      "latitude": 43.07469,
+      "longitude": -89.3841663,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "madrid-spain",
+      "location": "Madrid, Spain",
+      "latitude": 40.416782,
+      "longitude": -3.703507,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "maine-usa",
+      "location": "Maine, USA",
+      "latitude": 45.709097,
+      "longitude": -68.8590201,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "manchester-uk",
+      "location": "Manchester, UK",
+      "latitude": 53.4424618,
+      "longitude": -2.2324547,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "manila-philippines",
+      "location": "Manila, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "mannheim-germany",
+      "location": "Mannheim, Germany",
+      "latitude": 49.4892913,
+      "longitude": 8.4673098,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "massachusetts-usa",
+      "location": "Massachusetts, USA",
+      "latitude": 42.3788774,
+      "longitude": -72.032366,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "melbourne-australia",
+      "location": "Melbourne, Australia",
+      "latitude": -37.8142454,
+      "longitude": 144.9631732,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "merkers-germany",
+      "location": "Merkers, Germany",
+      "latitude": 50.8241612,
+      "longitude": 10.1176283,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "mexico_city-mexico",
+      "location": "Mexico City, Mexico",
+      "latitude": 19.3207722,
+      "longitude": -99.1514678,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "michigan-usa",
+      "location": "Michigan, USA",
+      "latitude": 43.6211955,
+      "longitude": -84.6824346,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "milan-italy",
+      "location": "Milan, Italy",
+      "latitude": 45.4641943,
+      "longitude": 9.1896346,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "minneapolis-usa",
+      "location": "Minneapolis, USA",
+      "latitude": 44.9772995,
+      "longitude": -93.2654692,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "minnesota-usa",
+      "location": "Minnesota, USA",
+      "latitude": 45.9896587,
+      "longitude": -94.6113288,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "minsk-belarus",
+      "location": "Minsk, Belarus",
+      "latitude": 53.9024716,
+      "longitude": 27.5618225,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "missouri-usa",
+      "location": "Missouri, USA",
+      "latitude": 38.7604815,
+      "longitude": -92.5617875,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "monchengladbach-germany",
+      "location": "Monchengladbach, Germany",
+      "latitude": 51.1947131,
+      "longitude": 6.4353792,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "monterrey-mexico",
+      "location": "Monterrey, Mexico",
+      "latitude": 25.6802019,
+      "longitude": -100.315258,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "montreal-canada",
+      "location": "Montreal, Canada",
+      "latitude": 45.5031824,
+      "longitude": -73.5698065,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "montreal-usa",
+      "location": "Montreal, USA",
+      "latitude": 37.9684745,
+      "longitude": -92.5913386,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "mumbai-india",
+      "location": "Mumbai, India",
+      "latitude": 19.054999,
+      "longitude": 72.8692035,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "munich-germany",
+      "location": "Munich, Germany",
+      "latitude": 48.1371079,
+      "longitude": 11.5753822,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "nagoya-japan",
+      "location": "Nagoya, Japan",
+      "latitude": 35.1851045,
+      "longitude": 136.8998438,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "napoca-romania",
+      "location": "Napoca, Romania",
+      "latitude": 46.769379,
+      "longitude": 23.5899542,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "nevada-usa",
+      "location": "Nevada, USA",
+      "latitude": 39.5158825,
+      "longitude": -116.853722,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "new_hampshire-usa",
+      "location": "New Hampshire, USA",
+      "latitude": 43.4849133,
+      "longitude": -71.6553992,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "new_orleans-usa",
+      "location": "New Orleans, USA",
+      "latitude": 29.9561422,
+      "longitude": -90.0733934,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "new_south_wales-australia",
+      "location": "New South Wales, Australia",
+      "latitude": -32.1629515,
+      "longitude": 147.0320566,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "new_york-usa",
+      "location": "New York, USA",
+      "latitude": 40.7127281,
+      "longitude": -74.0060152,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "newark-usa",
+      "location": "Newark, USA",
+      "latitude": 40.735657,
+      "longitude": -74.1723667,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "nickelsdorf-austria",
+      "location": "Nickelsdorf, Austria",
+      "latitude": 47.9403019,
+      "longitude": 17.0661763,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "nimes-france",
+      "location": "Nimes, France",
+      "latitude": 43.8374249,
+      "longitude": 4.3600687,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "north_carolina-usa",
+      "location": "North Carolina, USA",
+      "latitude": 35.6729639,
+      "longitude": -79.0392919,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "noumea-new_caledonia",
+      "location": "Noumea, New Caledonia",
+      "latitude": -22.2745264,
+      "longitude": 166.442419,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "oakland-usa",
+      "location": "Oakland, USA",
+      "latitude": 37.8044557,
+      "longitude": -122.271356,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "oklahoma-usa",
+      "location": "Oklahoma, USA",
+      "latitude": 34.9550817,
+      "longitude": -97.2684063,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "omaha-usa",
+      "location": "Omaha, USA",
+      "latitude": 41.2587459,
+      "longitude": -95.9383758,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "oregon-usa",
+      "location": "Oregon, USA",
+      "latitude": 43.9792797,
+      "longitude": -120.737257,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "osaka-japan",
+      "location": "Osaka, Japan",
+      "latitude": 34.6937569,
+      "longitude": 135.5014539,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "oslo-norway",
+      "location": "Oslo, Norway",
+      "latitude": 59.9133301,
+      "longitude": 10.7389701,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "ostrava-czechia",
+      "location": "Ostrava, Czechia",
+      "latitude": 49.8354045,
+      "longitude": 18.292978,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "oulu-finland",
+      "location": "Oulu, Finland",
+      "latitude": 65.0117914,
+      "longitude": 25.4701973,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "pagney_derriere_barine-france",
+      "location": "Pagney Derriere Barine, France",
+      "latitude": 48.6943,
+      "longitude": 5.8447,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "papeete-french_polynesia",
+      "location": "Papeete, French Polynesia",
+      "latitude": -17.5373835,
+      "longitude": -149.5659964,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "paris-france",
+      "location": "Paris, France",
+      "latitude": 48.8588897,
+      "longitude": 2.320041,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "pennsylvania-usa",
+      "location": "Pennsylvania, USA",
+      "latitude": 40.9699889,
+      "longitude": -77.7278831,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "penrose-new_zealand",
+      "location": "Penrose, New Zealand",
+      "latitude": -36.9111443,
+      "longitude": 174.8147813,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "philadelphia-usa",
+      "location": "Philadelphia, USA",
+      "latitude": 39.9527237,
+      "longitude": -75.1635262,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "pico_rivera-usa",
+      "location": "Pico Rivera, USA",
+      "latitude": 33.9830688,
+      "longitude": -118.096735,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "pittsburgh-usa",
+      "location": "Pittsburgh, USA",
+      "latitude": 40.4406968,
+      "longitude": -80.0025666,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "playa_del_carmen-mexico",
+      "location": "Playa Del Carmen, Mexico",
+      "latitude": 20.6461095,
+      "longitude": -87.0809021,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "porto_alegre-brazil",
+      "location": "Porto Alegre, Brazil",
+      "latitude": -30.0324999,
+      "longitude": -51.2303767,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "prague-czechia",
+      "location": "Prague, Czechia",
+      "latitude": 50.0874654,
+      "longitude": 14.4212535,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "quebec-canada",
+      "location": "Quebec, Canada",
+      "latitude": 52.4760892,
+      "longitude": -71.8258668,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "queensland-australia",
+      "location": "Queensland, Australia",
+      "latitude": -22.1646782,
+      "longitude": 144.5844903,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "recife-brazil",
+      "location": "Recife, Brazil",
+      "latitude": -8.0584933,
+      "longitude": -34.8848193,
+      "source": "nominatim",
+      "match": "fuzzy"
+    },
+    {
+      "key": "rio_de_janeiro-brazil",
+      "location": "Rio De Janeiro, Brazil",
+      "latitude": -22.9110137,
+      "longitude": -43.2093727,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "riyadh-saudi_arabia",
+      "location": "Riyadh, Saudi Arabia",
+      "latitude": 24.638916,
+      "longitude": 46.7160104,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "rosemont-usa",
+      "location": "Rosemont, USA",
+      "latitude": 41.9941334,
+      "longitude": -87.8756737,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "rotselaar-belgium",
+      "location": "Rotselaar, Belgium",
+      "latitude": 50.9514713,
+      "longitude": 4.7094054,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "saitama-japan",
+      "location": "Saitama, Japan",
+      "latitude": 35.8616141,
+      "longitude": 139.6455666,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "salem-germany",
+      "location": "Salem, Germany",
+      "latitude": 53.6563082,
+      "longitude": 10.8253152,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "san_francisco-usa",
+      "location": "San Francisco, USA",
+      "latitude": 37.7879363,
+      "longitude": -122.4075201,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "san_isidro-argentina",
+      "location": "San Isidro, Argentina",
+      "latitude": -34.4739792,
+      "longitude": -58.5264866,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "san_jose-costa_rica",
+      "location": "San Jose, Costa Rica",
+      "latitude": 9.9327707,
+      "longitude": -84.0796144,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "santiago-chile",
+      "location": "Santiago, Chile",
+      "latitude": -33.4376995,
+      "longitude": -70.6510671,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "sanya-china",
+      "location": "Sanya, China",
+      "latitude": 18.2534658,
+      "longitude": 109.5034392,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "sao_paulo-brazil",
+      "location": "Sao Paulo, Brazil",
+      "latitude": -23.5506507,
+      "longitude": -46.6333824,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "scheessel-germany",
+      "location": "Scheessel, Germany",
+      "latitude": 53.1667961,
+      "longitude": 9.4840648,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "seattle-usa",
+      "location": "Seattle, USA",
+      "latitude": 47.6038321,
+      "longitude": -122.330062,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "seoul-south_korea",
+      "location": "Seoul, South Korea",
+      "latitude": 37.5666791,
+      "longitude": 126.9782914,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "seville-spain",
+      "location": "Seville, Spain",
+      "latitude": 37.3886303,
+      "longitude": -5.9953403,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "sion-switzerland",
+      "location": "Sion, Switzerland",
+      "latitude": 46.2311749,
+      "longitude": 7.3588795,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "skanderborg-denmark",
+      "location": "Skanderborg, Denmark",
+      "latitude": 56.0351868,
+      "longitude": 9.9317878,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "sochaux-france",
+      "location": "Sochaux, France",
+      "latitude": 47.5138641,
+      "longitude": 6.8305344,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "south_carolina-usa",
+      "location": "South Carolina, USA",
+      "latitude": 33.6874388,
+      "longitude": -80.4363743,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "st_gallen-switzerland",
+      "location": "St Gallen, Switzerland",
+      "latitude": 47.425618,
+      "longitude": 9.3762397,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "st_louis-usa",
+      "location": "St Louis, USA",
+      "latitude": 38.6254063,
+      "longitude": -90.190009,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "stockholm-sweden",
+      "location": "Stockholm, Sweden",
+      "latitude": 59.3251172,
+      "longitude": 18.0710935,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "sydney-australia",
+      "location": "Sydney, Australia",
+      "latitude": -33.8698439,
+      "longitude": 151.2082848,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "taipei-taiwan",
+      "location": "Taipei, Taiwan",
+      "latitude": 25.0375198,
+      "longitude": 121.5636796,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "texas-usa",
+      "location": "Texas, USA",
+      "latitude": 31.2638905,
+      "longitude": -98.5456116,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "toronto-canada",
+      "location": "Toronto, Canada",
+      "latitude": 43.6534817,
+      "longitude": -79.3839347,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "toronto-usa",
+      "location": "Toronto, USA",
+      "latitude": 41.9048584,
+      "longitude": -90.8640346,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "turku-finland",
+      "location": "Turku, Finland",
+      "latitude": 60.4515932,
+      "longitude": 22.2669991,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "uniondale-usa",
+      "location": "Uniondale, USA",
+      "latitude": 40.7157545,
+      "longitude": -73.5898872,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "utah-usa",
+      "location": "Utah, USA",
+      "latitude": 39.4225192,
+      "longitude": -111.714358,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "vancouver-canada",
+      "location": "Vancouver, Canada",
+      "latitude": 49.2608724,
+      "longitude": -123.113952,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "victoria-australia",
+      "location": "Victoria, Australia",
+      "latitude": -36.5986096,
+      "longitude": 144.6780052,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "vienna-austria",
+      "location": "Vienna, Austria",
+      "latitude": 48.2083537,
+      "longitude": 16.3725042,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "warsaw-poland",
+      "location": "Warsaw, Poland",
+      "latitude": 52.2333742,
+      "longitude": 21.0711489,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "washington-usa",
+      "location": "Washington, USA",
+      "latitude": 38.8950982,
+      "longitude": -77.0363849,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "wellington-new_zealand",
+      "location": "Wellington, New Zealand",
+      "latitude": -41.2887953,
+      "longitude": 174.7772114,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "werchter-belgium",
+      "location": "Werchter, Belgium",
+      "latitude": 50.970584,
+      "longitude": 4.6937963,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "west_melbourne-australia",
+      "location": "West Melbourne, Australia",
+      "latitude": -37.808747,
+      "longitude": 144.9238207,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "westcliff_on_sea-uk",
+      "location": "Westcliff On Sea, UK",
+      "latitude": 51.5428858,
+      "longitude": 0.6859213,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "willemstad-netherlands_antilles",
+      "location": "Willemstad, Netherlands Antilles",
+      "latitude": 12.1066695,
+      "longitude": -68.9351307,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "windsor-canada",
+      "location": "Windsor, Canada",
+      "latitude": 42.2858536,
+      "longitude": -82.9780695,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "yogyakarta-indonesia",
+      "location": "Yogyakarta, Indonesia",
+      "latitude": -7.7953473,
+      "longitude": 110.3672845,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "zaragoza-spain",
+      "location": "Zaragoza, Spain",
+      "latitude": 41.6915847,
+      "longitude": -0.9101268,
+      "source": "nominatim",
+      "match": "exact"
+    },
+    {
+      "key": "zurich-switzerland",
+      "location": "Zurich, Switzerland",
+      "latitude": 47.3744489,
+      "longitude": 8.5410422,
+      "source": "nominatim",
+      "match": "exact"
+    }
+  ]
+}

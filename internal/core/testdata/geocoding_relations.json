@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "datesLocations": {
+      "london-uk": ["01-01-2020"],
+      "London, UK": ["02-01-2020"],
+      "berlin-germany": ["03-01-2020"]
+    }
+  },
+  {
+    "id": 2,
+    "datesLocations": {
+      "seattle-washington-usa": ["04-01-2020"]
+    }
+  }
+]

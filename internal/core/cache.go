@@ -124,14 +124,18 @@ func cloneDatesLocations(src map[string][]string) map[string][]string {
 // StartCache запускает воркер; вызывает refresh() сразу и потом каждые interval.
 func StartCache(ctx context.Context, interval time.Duration) {
 	once.Do(func() {
-		refresh() // первичное заполнение
+		if err := refresh(); err != nil {
+			log.Printf("initial cache refresh failed: %v", err)
+		}
 		go func() {
 			ticker := time.NewTicker(interval)
 			defer ticker.Stop()
 			for {
 				select {
 				case <-ticker.C:
-					refresh()
+					if err := refresh(); err != nil {
+						log.Printf("cache refresh failed: %v", err)
+					}
 				case <-ctx.Done():
 					return
 				}
@@ -192,6 +196,21 @@ func refresh() error {
 
 	if err, failed := <-errs; failed {
 		return err // хотя бы один запрос упал
+	}
+
+	if len(cd.Relations) > 0 {
+		report, err := EnsureGeocodingCoverage(cd.Relations)
+		if err != nil {
+			return fmt.Errorf("geocoding coverage: %w", err)
+		}
+		log.Printf(
+			"geocoding coverage: total=%d cache=%d automatic=%d fuzzy=%d missing=%d",
+			report.Total,
+			report.FromCache,
+			report.AutoFound,
+			report.FuzzyFound,
+			report.Missing,
+		)
 	}
 
 	cd.UpdatedAt = time.Now()
