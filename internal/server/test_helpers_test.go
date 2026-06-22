@@ -80,7 +80,7 @@ func testLocation(raw string, display string, normalized string, hierarchy []str
 
 func testDependenciesWithCatalog(cat catalog.Catalog, calls *int) dependencies {
 	return dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			return nil
 		},
 		loadCatalog: func() (catalog.Catalog, error) {

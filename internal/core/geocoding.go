@@ -47,7 +47,7 @@ func LookupLocationCoordinate(rawLocation string) (geocode.Coordinate, bool) {
 	return store.Lookup(rawLocation)
 }
 
-func EnsureGeocodingCoverage(relations []model.Relation) (geocode.CoverageReport, error) {
+func EnsureGeocodingCoverage(ctx context.Context, relations []model.Relation) (geocode.CoverageReport, error) {
 	geocodingMu.Lock()
 	defer geocodingMu.Unlock()
 
@@ -58,7 +58,7 @@ func EnsureGeocodingCoverage(relations []model.Relation) (geocode.CoverageReport
 	client := geocode.NewNominatimClient(geocode.NominatimClientConfig{
 		Logger: log.Default(),
 	})
-	report, err := geocode.EnsureCoverage(context.Background(), relations, store, client, log.Default())
+	report, err := geocode.EnsureCoverage(ctx, relations, store, client, log.Default())
 	if err != nil {
 		return report, err
 	}

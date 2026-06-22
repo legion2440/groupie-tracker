@@ -121,6 +121,9 @@ func (c *NominatimClient) Geocode(ctx context.Context, spec LocationSpec) (Match
 	if c == nil {
 		return Match{}, fmt.Errorf("nominatim client is nil")
 	}
+	if err := ctx.Err(); err != nil {
+		return Match{}, err
+	}
 	results, err := c.search(ctx, spec.Query)
 	if err != nil {
 		return Match{}, err
@@ -147,6 +150,9 @@ func (c *NominatimClient) Geocode(ctx context.Context, spec LocationSpec) (Match
 	}
 	c.logger.Printf("geocoding fallback for %q: %s", spec.Display, reason)
 
+	if err := ctx.Err(); err != nil {
+		return Match{}, err
+	}
 	fallbackResults, fallbackQuery, err := c.searchFallback(ctx, spec)
 	if err != nil {
 		return Match{}, err

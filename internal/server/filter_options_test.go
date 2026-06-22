@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -96,7 +97,7 @@ func TestFilterOptionsHandlerMethodValidation(t *testing.T) {
 func TestFilterOptionsHandlerLoaderFailure(t *testing.T) {
 	loadCalls := 0
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			return nil
 		},
 		loadCatalog: func() (catalog.Catalog, error) {

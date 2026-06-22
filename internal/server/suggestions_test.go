@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -132,7 +133,7 @@ func TestSuggestionsHandlerQueryTooLong(t *testing.T) {
 
 func TestSuggestionsHandlerLoaderFailure(t *testing.T) {
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			return nil
 		},
 		loadCatalog: func() (catalog.Catalog, error) {

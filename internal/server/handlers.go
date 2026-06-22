@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"io"
@@ -363,14 +364,14 @@ func artistDetailModel(artist catalog.ArtistEntry) model.Artist {
 }
 
 // принудительное обновление кеша
-type updateNowFunc func() error
+type updateNowFunc func(context.Context) error
 
 func serveRefresh(w http.ResponseWriter, r *http.Request, updateNow updateNowFunc) {
 	if r.Method != http.MethodPost {
 		renderError(w, http.StatusBadRequest, "Неверный HTTP-метод (ожидается POST)")
 		return
 	}
-	if err := updateNow(); err != nil {
+	if err := updateNow(r.Context()); err != nil {
 		log.Printf("update failed: %v", err)
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		return
@@ -403,18 +404,41 @@ func renderError(w http.ResponseWriter, code int, msg string) {
 
 /*───────────────────── image proxy ─────────────────────────*/
 
-const imgCacheMaxAge = 60 * 60 * 24 * 7 // 7 дней
+const (
+	imgCacheMaxAge          = 60 * 60 * 24 * 7 // 7 дней
+	imgProxyTimeout         = 10 * time.Second
+	imgProxyUpstreamBaseURL = "https://groupietrackers.herokuapp.com/api/images/"
+)
+
+var imgProxyClient = &http.Client{
+	Timeout: imgProxyTimeout,
+}
 
 func ImgProxy(w http.ResponseWriter, r *http.Request) {
-	filename := strings.TrimPrefix(r.URL.Path, "/img/")
-	orig := "https://groupietrackers.herokuapp.com/api/images/" + filename
+	serveImgProxy(w, r, imgProxyClient, imgProxyUpstreamBaseURL)
+}
 
-	resp, err := http.Get(orig)
-	if err != nil || resp.StatusCode != http.StatusOK {
+func serveImgProxy(w http.ResponseWriter, r *http.Request, client *http.Client, upstreamBaseURL string) {
+	filename := strings.TrimPrefix(r.URL.Path, "/img/")
+	orig := upstreamBaseURL + filename
+
+	req, err := http.NewRequestWithContext(r.Context(), http.MethodGet, orig, nil)
+	if err != nil {
+		renderError(w, http.StatusNotFound, "Картинка не найдена")
+		return
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
 		renderError(w, http.StatusNotFound, "Картинка не найдена")
 		return
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		renderError(w, http.StatusNotFound, "Картинка не найдена")
+		return
+	}
 
 	w.Header().Set("Cache-Control",
 		fmt.Sprintf("public, max-age=%d", imgCacheMaxAge))

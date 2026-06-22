@@ -1,8 +1,14 @@
 package core
 
 import (
+	"context"
+	"errors"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 
 	"groupie-tracker/internal/model"
 )
@@ -89,5 +95,112 @@ func TestArtistRelationsSnapshotFromCacheRequiresCompleteData(t *testing.T) {
 				t.Fatal("expected incomplete snapshot")
 			}
 		})
+	}
+}
+
+func TestUpdateNowDoesNotPublishFailedRefresh(t *testing.T) {
+	original := preserveCacheStore(t)
+	store.Store(original)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/artists" {
+			http.Error(w, "upstream failure", http.StatusInternalServerError)
+			return
+		}
+		writeCacheTestAPIResponse(w, r)
+	}))
+	defer server.Close()
+	setAPIURLsForTest(t, server.URL)
+
+	if err := UpdateNow(context.Background()); err == nil {
+		t.Fatal("expected refresh error")
+	}
+
+	got, ok := store.Load().(cacheData)
+	if !ok {
+		t.Fatal("cache store is empty")
+	}
+	if !reflect.DeepEqual(got, original) {
+		t.Fatalf("failed refresh changed cache: got %#v want %#v", got, original)
+	}
+}
+
+func TestUpdateNowCancellationDoesNotPublishPartialRefresh(t *testing.T) {
+	original := preserveCacheStore(t)
+	store.Store(original)
+
+	requestStarted := make(chan struct{}, 4)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestStarted <- struct{}{}
+		<-r.Context().Done()
+	}))
+	defer server.Close()
+	setAPIURLsForTest(t, server.URL)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan error, 1)
+	go func() {
+		done <- UpdateNow(ctx)
+	}()
+
+	for i := 0; i < 4; i++ {
+		select {
+		case <-requestStarted:
+		case <-time.After(time.Second):
+			t.Fatalf("only %d of 4 parallel API requests started", i)
+		}
+	}
+	cancel()
+
+	select {
+	case err := <-done:
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("expected context cancellation, got %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("refresh did not stop after context cancellation")
+	}
+
+	got, ok := store.Load().(cacheData)
+	if !ok {
+		t.Fatal("cache store is empty")
+	}
+	if !reflect.DeepEqual(got, original) {
+		t.Fatalf("canceled refresh changed cache: got %#v want %#v", got, original)
+	}
+}
+
+func preserveCacheStore(t *testing.T) cacheData {
+	t.Helper()
+
+	previous := store.Load()
+	t.Cleanup(func() {
+		if previous == nil {
+			store.Store(cacheData{})
+			return
+		}
+		store.Store(previous.(cacheData))
+	})
+
+	return cacheData{
+		Artists:   []model.Artist{{ID: 99, Name: "Cached Artist"}},
+		Relations: []model.Relation{{ID: 99}},
+		UpdatedAt: time.Unix(123, 0),
+	}
+}
+
+func writeCacheTestAPIResponse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	switch r.URL.Path {
+	case "/api/artists":
+		_, _ = io.WriteString(w, `[{"id":1,"name":"Fresh Artist"}]`)
+	case "/api/locations":
+		_, _ = io.WriteString(w, `{"locations":[{"id":1,"locations":[]}]}`)
+	case "/api/dates":
+		_, _ = io.WriteString(w, `{"dates":[{"id":1,"dates":[]}]}`)
+	case "/api/relation":
+		_, _ = io.WriteString(w, `{"index":[{"id":1,"datesLocations":{}}]}`)
+	default:
+		http.NotFound(w, r)
 	}
 }

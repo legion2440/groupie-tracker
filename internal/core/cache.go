@@ -36,7 +36,7 @@ func GetArtists() ([]model.Artist, error) {
 		return c.Artists, nil
 	}
 	// первый запуск или ошибка – тянем напрямую
-	arts, err := FetchArtists()
+	arts, err := FetchArtists(context.Background())
 	if err == nil {
 		refreshField(func(c *cacheData) { c.Artists = arts })
 	}
@@ -47,7 +47,7 @@ func GetRelations() ([]model.Relation, error) {
 	if c, ok := store.Load().(cacheData); ok && len(c.Relations) > 0 {
 		return c.Relations, nil
 	}
-	rel, err := FetchRelations()
+	rel, err := FetchRelations(context.Background())
 	if err == nil {
 		refreshField(func(c *cacheData) { c.Relations = rel })
 	}
@@ -61,7 +61,7 @@ func GetArtistRelationsSnapshot() (ArtistRelationsSnapshot, error) {
 		}
 	}
 
-	if err := UpdateNow(); err != nil {
+	if err := UpdateNow(context.Background()); err != nil {
 		return ArtistRelationsSnapshot{}, fmt.Errorf("refresh artist relations snapshot: %w", err)
 	}
 
@@ -124,7 +124,7 @@ func cloneDatesLocations(src map[string][]string) map[string][]string {
 // StartCache запускает воркер; вызывает refresh() сразу и потом каждые interval.
 func StartCache(ctx context.Context, interval time.Duration) {
 	once.Do(func() {
-		if err := refresh(); err != nil {
+		if err := refresh(ctx); err != nil {
 			log.Printf("initial cache refresh failed: %v", err)
 		}
 		go func() {
@@ -133,7 +133,7 @@ func StartCache(ctx context.Context, interval time.Duration) {
 			for {
 				select {
 				case <-ticker.C:
-					if err := refresh(); err != nil {
+					if err := refresh(ctx); err != nil {
 						log.Printf("cache refresh failed: %v", err)
 					}
 				case <-ctx.Done():
@@ -144,12 +144,12 @@ func StartCache(ctx context.Context, interval time.Duration) {
 	})
 }
 
-// ForceUpdate вручную перезапускает обновление (используем в /api/refresh).
-func ForceUpdate() { go refresh() }
+// ForceUpdate запускает отдельное фоновое обновление.
+func ForceUpdate() { go refresh(context.Background()) }
 
 // ----- внутреннее -----
 
-func refresh() error {
+func refresh(ctx context.Context) error {
 	var (
 		cd   cacheData
 		mu   sync.Mutex
@@ -172,22 +172,22 @@ func refresh() error {
 
 	go func() {
 		defer wg.Done()
-		arts, err := FetchArtists()
+		arts, err := FetchArtists(ctx)
 		add(func() { cd.Artists = arts }, err)
 	}()
 	go func() {
 		defer wg.Done()
-		rel, err := FetchRelations()
+		rel, err := FetchRelations(ctx)
 		add(func() { cd.Relations = rel }, err)
 	}()
 	go func() {
 		defer wg.Done()
-		loc, err := FetchLocations()
+		loc, err := FetchLocations(ctx)
 		add(func() { cd.Locations = loc }, err)
 	}()
 	go func() {
 		defer wg.Done()
-		d, err := FetchDates()
+		d, err := FetchDates(ctx)
 		add(func() { cd.Dates = d }, err)
 	}()
 
@@ -199,7 +199,7 @@ func refresh() error {
 	}
 
 	if len(cd.Relations) > 0 {
-		report, err := EnsureGeocodingCoverage(cd.Relations)
+		report, err := EnsureGeocodingCoverage(ctx, cd.Relations)
 		if err != nil {
 			return fmt.Errorf("geocoding coverage: %w", err)
 		}
@@ -213,6 +213,9 @@ func refresh() error {
 		)
 	}
 
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	cd.UpdatedAt = time.Now()
 	store.Store(cd)
 	log.Println("cache refreshed at", cd.UpdatedAt.Format(time.RFC822))
@@ -228,8 +231,8 @@ func refreshField(fn func(*cacheData)) {
 
 // UpdateNow скачивает данные синхронно.
 // Если хотя бы один запрос упал — кеш не трогаем, возвращаем ошибку.
-func UpdateNow() error {
-	if err := refresh(); err != nil {
+func UpdateNow(ctx context.Context) error {
+	if err := refresh(ctx); err != nil {
 		return err
 	}
 	return nil

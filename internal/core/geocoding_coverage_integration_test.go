@@ -3,13 +3,14 @@
 package core
 
 import (
+	"context"
 	"testing"
 
 	"groupie-tracker/internal/geocode"
 )
 
 func TestGeocodingCacheCoversFetchedRelations(t *testing.T) {
-	relations, err := FetchRelations()
+	relations, err := FetchRelations(context.Background())
 	if err != nil {
 		t.Fatalf("FetchRelations returned error: %v", err)
 	}

@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"groupie-tracker/internal/catalog"
 	"groupie-tracker/internal/model"
@@ -844,7 +846,7 @@ func TestRootHandlerInvalidQuery(t *testing.T) {
 
 func TestRootHandlerLoaderFailure(t *testing.T) {
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			return nil
 		},
 		loadCatalog: func() (catalog.Catalog, error) {
@@ -875,7 +877,7 @@ func TestRootHandlerLoaderFailure(t *testing.T) {
 func Test500Template(t *testing.T) {
 	forcedErr := errors.New("forced refresh failure")
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			return forcedErr
 		},
 		loadCatalog: func() (catalog.Catalog, error) {
@@ -913,7 +915,7 @@ func Test500Template(t *testing.T) {
 func TestRefreshSuccess(t *testing.T) {
 	callCount := 0
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			callCount++
 			return nil
 		},
@@ -938,12 +940,87 @@ func TestRefreshSuccess(t *testing.T) {
 	}
 }
 
+func TestRefreshPassesRequestContext(t *testing.T) {
+	type contextKey string
+	const key contextKey = "refresh-test"
+
+	var received any
+	mux := initRoutes(dependencies{
+		updateNow: func(ctx context.Context) error {
+			received = ctx.Value(key)
+			return nil
+		},
+		loadCatalog: func() (catalog.Catalog, error) {
+			return testCatalog(), nil
+		},
+	})
+
+	ctx := context.WithValue(context.Background(), key, "request-context")
+	req := httptest.NewRequest(http.MethodPost, "/api/refresh", nil).WithContext(ctx)
+	rec := httptest.NewRecorder()
+
+	mux.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rec.Code)
+	}
+	if received != "request-context" {
+		t.Fatalf("update function received context value %#v", received)
+	}
+}
+
+func TestRefreshCancellationStopsUpdate(t *testing.T) {
+	started := make(chan struct{})
+	stopped := make(chan struct{})
+	mux := initRoutes(dependencies{
+		updateNow: func(ctx context.Context) error {
+			close(started)
+			<-ctx.Done()
+			close(stopped)
+			return ctx.Err()
+		},
+		loadCatalog: func() (catalog.Catalog, error) {
+			return testCatalog(), nil
+		},
+	})
+
+	ctx, cancel := context.WithCancel(context.Background())
+	req := httptest.NewRequest(http.MethodPost, "/api/refresh", nil).WithContext(ctx)
+	rec := httptest.NewRecorder()
+	done := make(chan struct{})
+	go func() {
+		mux.ServeHTTP(rec, req)
+		close(done)
+	}()
+
+	select {
+	case <-started:
+	case <-time.After(time.Second):
+		t.Fatal("refresh did not start")
+	}
+	cancel()
+
+	select {
+	case <-stopped:
+	case <-time.After(time.Second):
+		t.Fatal("request cancellation did not stop refresh")
+	}
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("refresh handler did not return after cancellation")
+	}
+	if rec.Code != http.StatusInternalServerError {
+		t.Fatalf("expected 500 after canceled refresh, got %d", rec.Code)
+	}
+}
+
 // Проверяет, что при некорректном HTTP-методе (GET вместо POST) на /api/refresh
 // сервер возвращает статус 400 и фирменную страницу ошибки.
 func Test400Template(t *testing.T) {
 	callCount := 0
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			callCount++
 			return nil
 		},

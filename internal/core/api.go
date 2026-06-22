@@ -1,9 +1,9 @@
 package core
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"time"
@@ -35,74 +35,63 @@ var httpClient = &http.Client{
 	Timeout: overallRequestLimit,
 }
 
-func FetchArtists() ([]model.Artist, error) {
-	resp, err := httpClient.Get(artistsURL)
-	if err != nil {
-		return nil, fmt.Errorf("fetch artists: %w", err)
-	}
-	defer resp.Body.Close()
-
+func FetchArtists(ctx context.Context) ([]model.Artist, error) {
 	var artists []model.Artist
-	if err := json.NewDecoder(resp.Body).Decode(&artists); err != nil {
-		return nil, fmt.Errorf("decode artists: %w", err)
+	if err := fetchJSON(ctx, httpClient, "artists", artistsURL, &artists); err != nil {
+		return nil, err
 	}
 	return artists, nil
 }
 
-func FetchLocations() ([]model.Location, error) {
-	resp, err := httpClient.Get(locationsURL)
-	if err != nil {
-		return nil, fmt.Errorf("fetch locations: %w", err)
-	}
-	defer resp.Body.Close()
-
+func FetchLocations(ctx context.Context) ([]model.Location, error) {
 	// В API locations данные лежат в поле "locations"
 	var result struct {
 		Locations []model.Location `json:"locations"`
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("read locations: %w", err)
-	}
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("decode locations: %w", err)
+	if err := fetchJSON(ctx, httpClient, "locations", locationsURL, &result); err != nil {
+		return nil, err
 	}
 	return result.Locations, nil
 }
 
-func FetchDates() ([]model.Date, error) {
-	resp, err := httpClient.Get(datesURL)
-	if err != nil {
-		return nil, fmt.Errorf("fetch dates: %w", err)
-	}
-	defer resp.Body.Close()
-
+func FetchDates(ctx context.Context) ([]model.Date, error) {
 	// В API dates данные лежат в поле "dates"
 	var result struct {
 		Dates []model.Date `json:"dates"`
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("read dates: %w", err)
-	}
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("decode dates: %w", err)
+	if err := fetchJSON(ctx, httpClient, "dates", datesURL, &result); err != nil {
+		return nil, err
 	}
 	return result.Dates, nil
 }
 
-func FetchRelations() ([]model.Relation, error) {
-	resp, err := httpClient.Get(relationsURL)
-	if err != nil {
-		return nil, fmt.Errorf("fetch relations: %w", err)
-	}
-	defer resp.Body.Close()
-
+func FetchRelations(ctx context.Context) ([]model.Relation, error) {
 	var wrapper struct {
 		Index []model.Relation `json:"index"` // <-- ключ правильный
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&wrapper); err != nil {
-		return nil, fmt.Errorf("decode relations: %w", err)
+	if err := fetchJSON(ctx, httpClient, "relations", relationsURL, &wrapper); err != nil {
+		return nil, err
 	}
 	return wrapper.Index, nil
+}
+
+func fetchJSON(ctx context.Context, client *http.Client, endpointName, endpointURL string, dst any) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpointURL, nil)
+	if err != nil {
+		return fmt.Errorf("fetch %s: create request: %w", endpointName, err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("fetch %s: %w", endpointName, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return fmt.Errorf("fetch %s: upstream returned status %d", endpointName, resp.StatusCode)
+	}
+	if err := json.NewDecoder(resp.Body).Decode(dst); err != nil {
+		return fmt.Errorf("decode %s: %w", endpointName, err)
+	}
+	return nil
 }

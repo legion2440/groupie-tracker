@@ -55,6 +55,9 @@ func EnsureCoverage(ctx context.Context, relations []model.Relation, store *Stor
 	if store == nil {
 		return CoverageReport{}, fmt.Errorf("geocoding store is nil")
 	}
+	if err := ctx.Err(); err != nil {
+		return CoverageReport{}, err
+	}
 	if logger == nil {
 		logger = log.Default()
 	}
@@ -64,6 +67,9 @@ func EnsureCoverage(ctx context.Context, relations []model.Relation, store *Stor
 	added := false
 
 	for _, spec := range specs {
+		if err := ctx.Err(); err != nil {
+			return report, err
+		}
 		if _, ok := store.LookupKey(spec.Key); ok {
 			report.FromCache++
 			continue
@@ -78,9 +84,15 @@ func EnsureCoverage(ctx context.Context, relations []model.Relation, store *Stor
 
 		match, err := client.Geocode(ctx, spec)
 		if err != nil {
+			if ctxErr := ctx.Err(); ctxErr != nil {
+				return report, ctxErr
+			}
 			report.MissingLocations = append(report.MissingLocations, spec.Key)
 			logger.Printf("location without coordinates: %s: %v", spec.Key, err)
 			continue
+		}
+		if err := ctx.Err(); err != nil {
+			return report, err
 		}
 		entry := Entry{
 			Key:       spec.Key,
@@ -105,6 +117,9 @@ func EnsureCoverage(ctx context.Context, relations []model.Relation, store *Stor
 	}
 
 	if added {
+		if err := ctx.Err(); err != nil {
+			return report, err
+		}
 		if err := store.Save(); err != nil {
 			return report, err
 		}

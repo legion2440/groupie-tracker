@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"groupie-tracker/internal/core"
@@ -20,7 +22,10 @@ func main() {
 	minInterval := flag.Duration("interval", time.Second, "minimum interval between Nominatim requests")
 	flag.Parse()
 
-	relations, err := core.FetchRelations()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	relations, err := core.FetchRelations(ctx)
 	if err != nil {
 		log.Fatalf("fetch relations: %v", err)
 	}
@@ -37,7 +42,7 @@ func main() {
 		Logger:      log.Default(),
 	})
 
-	report, err := geocode.EnsureCoverage(context.Background(), relations, store, client, log.Default())
+	report, err := geocode.EnsureCoverage(ctx, relations, store, client, log.Default())
 	fmt.Printf("Unique locations: %d\n", report.Total)
 	fmt.Printf("Already in JSON: %d\n", report.FromCache)
 	fmt.Printf("Found automatically: %d\n", report.AutoFound)

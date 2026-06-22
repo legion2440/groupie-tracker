@@ -382,7 +382,7 @@ func TestDeezerPreviewMissingResultCacheHit(t *testing.T) {
 
 func TestDeezerPreviewEndpoint(t *testing.T) {
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			return nil
 		},
 		loadCatalog: func() (catalog.Catalog, error) {
@@ -428,7 +428,7 @@ func TestDeezerPreviewEndpoint(t *testing.T) {
 
 func TestUnavailablePreviewDoesNotBreakCards(t *testing.T) {
 	mux := initRoutes(dependencies{
-		updateNow: func() error {
+		updateNow: func(context.Context) error {
 			return nil
 		},
 		loadCatalog: func() (catalog.Catalog, error) {
